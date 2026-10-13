@@ -1,0 +1,1957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Capitalflow — Asset Inspections (Demo)</title>
+<link rel="icon" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --navy:#0e2a52; --navy-2:#153a6b; --pink:#e6237e; --green:#3aa635;
+  --amber:#e9a21b; --red:#d6303a; --blue:#1a5aa3;
+  --bg:#eef1f5; --panel:#f5f6f8; --panel-2:#ebedf0; --line:#dde2ea;
+  --text:#1f2733; --mid:#6b7585; --white:#fff;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;}
+body{font-family:Inter,-apple-system,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased;}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit;}
+a{color:var(--navy-2);}
+.hidden{display:none !important;}
+
+/* ---------- staff shell ---------- */
+.topbar{background:var(--navy);color:#fff;position:sticky;top:0;z-index:500;}
+.topbar-in{max-width:1200px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:22px;}
+.logo-pill{background:#fff;border-radius:7px;padding:4px 9px;display:flex;align-items:center;}
+.logo-pill{flex-shrink:0;}
+.logo-pill img{height:24px;width:auto;display:block;}
+.nav{display:flex;gap:4px;flex:1;}
+.nav a{color:#c8d3e3;text-decoration:none;font-weight:500;padding:7px 12px;border-radius:7px;font-size:13.5px;}
+.nav a:hover{background:rgba(255,255,255,.08);color:#fff;}
+.nav a.active{background:rgba(255,255,255,.14);color:#fff;}
+.live{display:flex;align-items:center;gap:6px;font-size:11.5px;color:#a9bad1;}
+.live i{width:7px;height:7px;border-radius:50%;background:#4cd964;box-shadow:0 0 0 3px rgba(76,217,100,.2);}
+.live.off i{background:#999;box-shadow:none;}
+.usermenu{position:relative;}
+.userbtn{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.08);border:none;color:#fff;border-radius:22px;padding:4px 12px 4px 4px;cursor:pointer;}
+.avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
+.userbtn small{display:block;font-size:10.5px;color:#a9bad1;line-height:1.1;text-align:left;}
+.userbtn b{display:block;font-size:12.5px;font-weight:600;line-height:1.2;text-align:left;}
+.dropdown{position:absolute;right:0;top:calc(100% + 6px);background:#fff;color:var(--text);border-radius:10px;box-shadow:0 12px 32px rgba(14,42,82,.22);min-width:250px;padding:6px;z-index:600;}
+.dropdown .dd-h{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--mid);padding:8px 10px 4px;}
+.dropdown button{display:flex;align-items:center;gap:9px;width:100%;background:none;border:none;padding:7px 10px;border-radius:7px;cursor:pointer;text-align:left;font-size:13px;}
+.dropdown button:hover{background:var(--panel);}
+.dropdown hr{border:none;border-top:1px solid var(--line);margin:5px 0;}
+.main{max-width:1200px;margin:0 auto;padding:24px 20px 60px;}
+
+h1{font-size:22px;margin:0;color:var(--navy);letter-spacing:-.2px;}
+h2{font-size:16px;margin:0 0 12px;color:var(--navy);}
+h3{font-size:14px;margin:0 0 10px;color:var(--navy);}
+.sub{color:var(--mid);margin:3px 0 0;font-size:13px;}
+.pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap;}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;}
+.muted{color:var(--mid);}
+.small{font-size:12px;}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;border-radius:9px;padding:10px 16px;font-weight:600;font-size:13.5px;cursor:pointer;text-decoration:none;white-space:nowrap;}
+.btn-primary{background:var(--pink);color:#fff;}
+.btn-primary:hover{background:#cf1c6f;}
+.btn-navy{background:var(--navy);color:#fff;}
+.btn-navy:hover{background:var(--navy-2);}
+.btn-green{background:var(--green);color:#fff;}
+.btn-outline{background:#fff;border:1px solid var(--line);color:var(--text);}
+.btn-outline:hover{border-color:#b9c2cf;}
+.btn-danger-o{background:#fff;border:1px solid #f0b3c9;color:#b8134f;}
+.btn-sm{padding:7px 12px;font-size:12.5px;border-radius:8px;}
+.btn-block{display:flex;width:100%;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.linkbtn{background:none;border:none;color:var(--navy-2);text-decoration:underline;cursor:pointer;padding:0;font-size:12.5px;}
+
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap;}
+.pill::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;}
+.p-sent{background:#e3eefc;color:var(--blue);}
+.p-progress{background:#fff1d6;color:#9a6200;}
+.p-review{background:#e6e9f7;color:#2f3f8f;}
+.p-approved{background:#def3dc;color:#2a7a26;}
+.p-query{background:#fde1ec;color:#b8134f;}
+.p-cancelled{background:#eceef1;color:#6b7585;}
+
+/* dashboard */
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px;}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;cursor:pointer;text-align:left;}
+.kpi:hover{border-color:#b9c2cf;}
+.kpi.on{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy);}
+.kpi b{display:block;font-size:26px;line-height:1.1;color:var(--navy);font-weight:700;}
+.kpi span{font-size:12px;color:var(--mid);}
+.kpi.k-amber b{color:#b57800;} .kpi.k-pink b{color:var(--pink);} .kpi.k-green b{color:var(--green);}
+.dash-grid{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start;}
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
+.search{flex:1;min-width:200px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:9px 12px;}
+.toggle{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:9px;padding:3px;}
+.toggle button{border:none;background:none;padding:6px 12px;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:500;color:var(--mid);}
+.toggle button.on{background:var(--navy);color:#fff;}
+.tbl-wrap{background:#fff;border:1px solid var(--line);border-radius:12px;overflow-x:auto;}
+.dash-grid > *,.two > *{min-width:0;}
+table.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--mid);font-weight:600;padding:11px 12px;background:var(--panel);border-bottom:1px solid var(--line);}
+.tbl td{padding:12px;border-bottom:1px solid #eef0f3;vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tbody tr{cursor:pointer;}
+.tbl tbody tr:hover td{background:#f8fafc;}
+.tbl .t2{display:block;font-size:11.5px;color:var(--mid);margin-top:1px;}
+.flags{display:flex;gap:5px;}
+.fl{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:6px;}
+.fl svg{width:11px;height:11px;}
+.fl.r{background:#fde3e4;color:var(--red);} .fl.a{background:#fff1d6;color:#a86e00;} .fl.s{background:#f0e6fb;color:#6d2fb0;} .fl.ok{background:#def3dc;color:#2a7a26;}
+.progress-mini{height:4px;background:#eef0f3;border-radius:3px;margin-top:5px;width:90px;overflow:hidden;}
+.progress-mini i{display:block;height:100%;background:var(--amber);}
+.feed-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #eef0f3;font-size:12.5px;}
+.feed-item:last-child{border-bottom:none;}
+.feed-item .avatar{width:26px;height:26px;font-size:10px;}
+.feed-item .ft{color:var(--mid);font-size:11px;margin-top:2px;}
+.empty{padding:40px 20px;text-align:center;color:var(--mid);}
+
+/* forms */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px;}
+.form-grid .full{grid-column:1/-1;}
+.fld label{display:block;font-size:12px;font-weight:600;color:var(--text);margin-bottom:5px;}
+.fld label .req{color:var(--pink);}
+.fld .hint{font-size:11.5px;color:var(--mid);margin-top:4px;}
+.inp{width:100%;background:#fff;border:1px solid #cfd6e0;border-radius:9px;padding:10px 12px;outline:none;}
+.inp:focus{border-color:var(--navy-2);box-shadow:0 0 0 3px rgba(21,58,107,.12);}
+.inp.err,.err .inp{border-color:var(--pink);background:#fff7fa;}
+.seg{display:flex;gap:8px;flex-wrap:wrap;}
+.seg button{flex:1;min-width:90px;background:#fff;border:1px solid #cfd6e0;border-radius:9px;padding:10px 12px;cursor:pointer;font-weight:500;text-align:center;}
+.seg button.on{border-color:var(--navy);background:#eef3fa;color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy);font-weight:600;}
+.err .seg button{border-color:#f0a8c5;}
+.boltons{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.bolt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:11px 12px;cursor:pointer;background:#fff;}
+.bolt.on{border-color:var(--navy);background:#f3f6fb;}
+.bolt input{margin-top:3px;accent-color:var(--navy);}
+.bolt b{display:block;font-size:13px;}
+.bolt span{font-size:11.5px;color:var(--mid);}
+.form-sec{margin-bottom:16px;}
+.form-sec h2{display:flex;align-items:center;gap:9px;}
+.form-sec h2 .n{width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:11.5px;display:flex;align-items:center;justify-content:center;}
+.side-note{background:#f3f6fb;border:1px solid #d5deeb;border-radius:12px;padding:16px;font-size:13px;}
+.side-note ol{margin:8px 0 0;padding-left:18px;}
+.side-note li{margin-bottom:6px;}
+
+/* sent / tracking */
+.two{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;align-items:start;}
+.linkbox{display:flex;gap:8px;align-items:center;background:var(--panel);border:1px dashed #b9c2cf;border-radius:10px;padding:10px 12px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;word-break:break-all;}
+.linkbox span{flex:1;}
+.timeline{list-style:none;padding:0;margin:0;}
+.timeline li{position:relative;padding:0 0 16px 28px;font-size:13px;}
+.timeline li::before{content:'';position:absolute;left:7px;top:18px;bottom:-2px;width:2px;background:var(--line);}
+.timeline li:last-child::before{display:none;}
+.timeline li i{position:absolute;left:0;top:2px;width:16px;height:16px;border-radius:50%;border:2px solid #cfd6e0;background:#fff;}
+.timeline li.done i{background:var(--green);border-color:var(--green);}
+.timeline li.now i{border-color:var(--amber);background:#fff1d6;}
+.timeline li small{display:block;color:var(--mid);font-size:11.5px;}
+.sms{background:#e9e9eb;border-radius:18px 18px 18px 4px;padding:10px 13px;font-size:13px;max-width:330px;}
+.sms-from{font-size:11px;color:var(--mid);margin-bottom:5px;}
+.qr{background:#fff;padding:8px;border-radius:8px;border:1px solid var(--line);display:inline-block;}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:8px 12px;font-size:13px;}
+.kv dt{color:var(--mid);} .kv dd{margin:0;font-weight:500;}
+
+/* ---------- report ---------- */
+.rep{max-width:880px;margin:0 auto;}
+.rep-actions{display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;}
+.rep-actions .sp{flex:1;}
+.rblock{background:var(--panel);border-radius:14px;padding:18px 20px;margin-bottom:12px;}
+.hero{position:relative;border-radius:14px;overflow:hidden;margin-bottom:12px;min-height:300px;background:#fff;}
+.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.42;filter:grayscale(.6);}
+.hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#fff 30%,rgba(255,255,255,.2) 75%,rgba(255,255,255,0));}
+.hero-in{position:relative;padding:22px;display:flex;flex-direction:column;gap:14px;max-width:330px;}
+.hero-brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--navy);font-size:13px;letter-spacing:.3px;text-transform:uppercase;}
+.hero-brand img{height:34px;}
+.impact-box{background:rgba(245,246,248,.92);border-radius:12px;padding:12px 14px;display:flex;gap:12px;}
+.impact-ico{width:34px;height:34px;border-radius:9px;background:#a5e6a0;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.impact-box b{font-size:13px;}
+.impact-box ul{list-style:none;margin:4px 0 0;padding:0;font-size:12.5px;}
+.impact-box li{display:flex;gap:7px;align-items:center;margin-top:3px;}
+.leaf{width:7px;height:11px;border-radius:7px 7px 7px 0;background:#7fd27a;transform:rotate(-20deg);flex-shrink:0;}
+.client-logo{background:#fff;border-radius:12px;padding:16px;display:flex;align-items:center;justify-content:center;}
+.client-logo img{height:44px;}
+.headcard-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px;}
+.itype{font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.3px;}
+.itype small{display:block;font-size:12px;font-weight:500;color:var(--mid);letter-spacing:0;}
+.qstatus{display:flex;align-items:center;gap:10px;font-weight:600;color:var(--text);}
+.qstatus svg{width:30px;height:30px;}
+.hgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px 22px;background:var(--panel-2);border-radius:10px;padding:14px 16px;font-size:12.5px;}
+.hgrid div span{display:block;color:var(--mid);font-size:11.5px;}
+.hgrid div b{font-weight:600;word-break:break-word;}
+.hgrid .full{grid-column:1/-1;}
+.disclaimer{font-size:11.5px;color:#3d4553;line-height:1.55;}
+.alert-box{background:#f5d3d5;border-radius:12px;padding:14px 18px;margin-bottom:12px;}
+.alert-box .ar{display:flex;gap:12px;align-items:flex-start;font-size:13px;margin:5px 0;}
+.alert-box svg{width:20px;height:20px;flex-shrink:0;margin-top:1px;}
+.alert-box.amber{background:#fbe9c6;}
+.refbar{background:var(--panel);border-radius:12px;padding:12px 18px;font-size:16px;font-weight:600;margin-bottom:12px;}
+.flagmap{display:grid;grid-template-columns:190px 1fr;gap:12px;background:var(--panel);border-radius:14px;padding:12px;margin-bottom:12px;}
+.flagcol{display:flex;flex-direction:column;gap:8px;}
+.flagcard{background:#fff;border-radius:9px;padding:11px 12px;display:flex;align-items:center;gap:9px;font-weight:600;font-size:13px;cursor:pointer;border:1px solid transparent;}
+.flagcard:hover{border-color:var(--line);}
+.flagcard svg{width:18px;height:18px;}
+.flaglist{background:#fff;border-radius:9px;padding:6px 12px;font-size:12px;}
+.flaglist div{padding:6px 0;border-bottom:1px solid #eef0f3;}
+.flaglist div:last-child{border-bottom:none;}
+.mapwrap{position:relative;border-radius:10px;overflow:hidden;min-height:270px;background:#dfe7ee;}
+#map{position:absolute;inset:0;}
+.maplegend{position:absolute;left:12px;bottom:12px;background:#fff;border-radius:10px;padding:9px 12px;font-size:11.5px;z-index:400;box-shadow:0 2px 10px rgba(0,0,0,.12);}
+.maplegend .ea{display:flex;align-items:center;gap:6px;font-weight:600;margin-bottom:3px;}
+.mk{width:24px;height:24px;border-radius:50%;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.35);}
+.mk-e{background:#7fd27a;color:#1d4d1a;} .mk-a{background:var(--red);}
+.mk-line{width:30px;height:3px;background:var(--red);border-radius:2px;}
+.impact2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.impact2 .col{border-radius:10px;padding:14px 16px;}
+.impact2 .col.hl{background:var(--panel-2);}
+.impact2 h4{margin:0 0 8px;font-size:14.5px;font-weight:600;}
+.impact2 ul{list-style:none;margin:0;padding:0;font-size:13px;}
+.impact2 li{display:flex;gap:9px;align-items:center;padding:6px 0;}
+.footnotes{font-size:11px;color:#3d4553;font-style:italic;margin-top:10px;line-height:1.55;}
+.sec{display:grid;grid-template-columns:150px 1fr;gap:14px;background:var(--panel);border-radius:14px;padding:14px;margin-bottom:12px;break-inside:avoid-page;}
+.sec-t{font-weight:700;font-size:14.5px;padding:6px 0 0 4px;color:var(--text);}
+.sec-rows{display:flex;flex-direction:column;gap:10px;}
+.qa{background:#fff;border-radius:8px;padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;}
+.qa .ans{font-weight:500;}
+.qa .ans.bad{color:var(--red);font-weight:600;}
+.qa .ans.warn{color:#a86e00;font-weight:600;}
+.qa .ans .match{font-size:11px;font-weight:600;margin-left:6px;}
+.ph{background:var(--panel-2);border-radius:8px;padding:10px 12px 14px;font-size:13px;}
+.ph-card{display:inline-block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px;margin-top:8px;width:150px;cursor:zoom-in;}
+.ph-card img{width:100%;height:150px;object-fit:cover;border-radius:8px 8px 22px 8px;display:block;}
+.ph-card .st{font-size:9.5px;color:#3d4553;display:flex;align-items:center;gap:4px;margin-top:6px;}
+.ph-card .st svg{width:11px;height:11px;}
+.ph-card .spoof{font-size:9.5px;color:#6d2fb0;font-weight:700;margin-top:3px;}
+.qa-note{font-size:12px;color:#3d4553;background:#fff;border-left:3px solid var(--amber);border-radius:6px;padding:8px 12px;}
+.bolt-list li{margin-bottom:10px;font-size:12.5px;}
+.bolt-list b{display:block;font-size:13px;}
+.review-panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:12px;}
+.decision{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;margin-bottom:14px;font-size:13px;}
+.decision.d-none{background:#e6e9f7;} .decision.d-ok{background:#def3dc;} .decision.d-q{background:#fde1ec;}
+.comment{display:flex;gap:10px;margin-bottom:12px;font-size:13px;}
+.comment .cb{background:var(--panel);border-radius:10px;padding:8px 12px;flex:1;}
+.comment .cb small{color:var(--mid);font-size:11px;}
+.audit li{font-size:12.5px;margin-bottom:6px;}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out;}
+.lightbox img{max-width:100%;max-height:90vh;border-radius:8px;}
+
+/* ---------- inspector (link) flow ---------- */
+.ins{max-width:520px;margin:0 auto;min-height:100vh;background:#fff;display:flex;flex-direction:column;}
+.ins-top{background:var(--navy);color:#fff;padding:12px 16px;position:sticky;top:0;z-index:50;}
+.ins-top .row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.ins-top .logo-pill img{height:20px;}
+.ins-top .stepname{font-size:12px;color:#c8d3e3;}
+.pbar{height:5px;background:rgba(255,255,255,.18);border-radius:4px;margin-top:10px;overflow:hidden;}
+.pbar i{display:block;height:100%;background:var(--pink);transition:width .3s;}
+.ins-body{flex:1;padding:20px 18px 28px;}
+.ins-body h1{font-size:21px;}
+.gps-chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;padding:4px 10px;border-radius:20px;background:#def3dc;color:#2a7a26;font-weight:600;margin-bottom:14px;}
+.gps-chip.wait{background:#eef0f3;color:var(--mid);}
+.gps-chip.bad{background:#fde1ec;color:#b8134f;}
+.q{margin-bottom:20px;}
+.q > label{display:block;font-weight:600;font-size:14px;margin-bottom:8px;}
+.q > label .req{color:var(--pink);}
+.q .qerr{display:none;color:#b8134f;font-size:12px;margin-top:5px;}
+.q.err .qerr{display:block;}
+.ins .inp{padding:13px 14px;font-size:16px;}
+.ins .seg button{padding:13px 10px;font-size:15px;}
+.ptile{position:relative;border:2px dashed #cfd6e0;border-radius:12px;background:var(--panel);height:200px;display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--mid);text-align:center;font-size:13px;cursor:pointer;}
+.ptile.has{border-style:solid;border-color:var(--green);}
+.err .ptile{border-color:var(--pink);}
+.ptile img{width:100%;height:100%;object-fit:cover;}
+.ptile .tick{position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.ptile svg{width:34px;height:34px;display:block;margin:0 auto 6px;}
+.prow{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:10px;}
+.ins-foot{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 18px calc(12px + env(safe-area-inset-bottom));display:flex;gap:10px;}
+.ins-foot .btn{flex:1;padding:14px;font-size:15px;}
+.need{list-style:none;padding:0;margin:14px 0;}
+.need li{display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #eef0f3;font-size:14px;}
+.need li .ni{width:30px;height:30px;border-radius:8px;background:#eef3fa;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;}
+.asset-card{background:var(--panel);border-radius:12px;padding:14px;margin:14px 0;}
+.asset-card > b{font-size:16px;color:var(--navy);}
+.notice{border-radius:10px;padding:11px 13px;font-size:13px;margin-bottom:14px;}
+.n-info{background:#eef3fa;color:#1d3a66;}
+.n-warn{background:#fff4dc;color:#7a5200;}
+.n-err{background:#fde1ec;color:#8a0f3d;}
+.rv-sec{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;}
+.rv-sec .h{display:flex;justify-content:space-between;align-items:center;font-weight:600;margin-bottom:6px;}
+.rv-sec .l{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:3px 0;}
+.rv-sec .l span{color:var(--mid);}
+.rv-thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.rv-thumbs img{width:54px;height:54px;object-fit:cover;border-radius:7px;}
+.declare{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;background:var(--panel);border-radius:10px;padding:12px;}
+.declare input{width:20px;height:20px;accent-color:var(--navy);flex-shrink:0;}
+.done-tick{width:72px;height:72px;border-radius:50%;background:var(--green);color:#fff;font-size:36px;display:flex;align-items:center;justify-content:center;margin:40px auto 18px;}
+
+/* login */
+.login-wrap{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;}
+.login-l{background:var(--navy);color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:space-between;}
+.login-l h1{color:#fff;font-size:30px;line-height:1.2;margin-top:40px;}
+.login-l p{color:#c8d3e3;font-size:15px;max-width:420px;}
+.login-l ul{list-style:none;padding:0;color:#dfe7f2;font-size:14px;}
+.login-l li{margin:10px 0;display:flex;gap:10px;}
+.login-l li::before{content:'✓';color:#7fd27a;font-weight:700;}
+.login-r{display:flex;align-items:center;justify-content:center;padding:30px;}
+.login-card{width:100%;max-width:380px;}
+.quick-users button{display:flex;align-items:center;gap:10px;width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:8px;cursor:pointer;text-align:left;}
+.quick-users button:hover{border-color:var(--navy);}
+.quick-users small{display:block;color:var(--mid);font-size:11.5px;}
+
+/* team */
+.roles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px;}
+.role-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;font-size:12.5px;}
+.role-card b{display:block;font-size:13.5px;margin-bottom:4px;color:var(--navy);}
+
+.toast-wrap{position:fixed;right:18px;bottom:18px;z-index:3000;display:flex;flex-direction:column;gap:8px;}
+.toast{background:var(--navy);color:#fff;border-radius:10px;padding:11px 15px;font-size:13px;box-shadow:0 10px 26px rgba(0,0,0,.25);max-width:340px;animation:tin .25s ease-out;}
+@keyframes tin{from{transform:translateY(10px);opacity:0;}to{transform:none;opacity:1;}}
+.demo-strip{background:#fff4dc;color:#7a5200;font-size:12px;text-align:center;padding:6px 12px;}
+.demo-strip button{background:none;border:none;color:#7a5200;text-decoration:underline;cursor:pointer;font-size:12px;}
+
+@media (max-width:900px){
+  .kpis{grid-template-columns:repeat(3,1fr);}
+  .dash-grid,.two{grid-template-columns:minmax(0,1fr) !important;}
+  .login-wrap{grid-template-columns:1fr;}
+  .login-l{padding:28px;} .login-l h1{margin-top:20px;font-size:24px;}
+  .roles{grid-template-columns:1fr;}
+}
+@media (max-width:680px){
+  .topbar-in{gap:10px;padding:10px 14px;flex-wrap:wrap;}
+  .nav{order:3;width:100%;flex:none;overflow-x:auto;}
+  .live{display:none;}
+  .userbtn small,.userbtn b{display:none;}
+  .userbtn{padding:4px;}
+  .main{padding:18px 14px 50px;}
+  .kpis{grid-template-columns:repeat(2,1fr);}
+  .form-grid,.boltons,.hgrid,.impact2{grid-template-columns:1fr;}
+  .flagmap{grid-template-columns:1fr;}
+  .sec{grid-template-columns:1fr;}
+  .qa{grid-template-columns:1fr;gap:3px;}
+  .tbl .hide-m{display:none;}
+  .hero-in{max-width:none;}
+}
+@media print{
+  body{background:#fff;}
+  .topbar,.rep-actions,.no-print,.toast-wrap,.demo-strip{display:none !important;}
+  .main{padding:0;max-width:none;}
+  .sec,.rblock,.flagmap,.alert-box{break-inside:avoid;}
+  .page-break{break-before:page;}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+// =====================================================================
+//  Reference data
+// =====================================================================
+const LOGO = '/logo.png';
+const CLIENT = 'Capitalflow Commercial Finance';
+const HQ = { lat: 53.3398, lon: -6.2493, label: 'Capitalflow head office, Dublin' };
+
+const CATS = {
+  car:   { label: 'Vehicle (Car — private passenger)', kind: 'vehicle', noun: 'vehicle' },
+  lcv:   { label: 'Vehicle (Light commercial / van)',   kind: 'vehicle', noun: 'vehicle' },
+  hgv:   { label: 'Vehicle (HGV / truck)',              kind: 'vehicle', noun: 'vehicle' },
+  plant: { label: 'Plant & machinery',                  kind: 'plant',   noun: 'machine' },
+  agri:  { label: 'Agricultural machinery',             kind: 'plant',   noun: 'machine' },
+};
+
+const INSPECTOR_ROLES = {
+  Customer: 'Self-inspection by customer',
+  Dealer:   'Inspection by supplying dealer',
+  Broker:   'Inspection by introducing broker',
+};
+
+// optional extra checks on top of the standard inspection
+const BOLTONS = [
+  { key: 'insurance', name: 'Insurance records', desc: 'Photo of the current insurance certificate', kinds: ['vehicle', 'plant'],
+    fields: [
+      { key: 'insPhoto', label: 'Photo of the insurance certificate', type: 'photo', req: true, sample: 'doc' },
+      { key: 'insurer', label: 'Insurer', type: 'text', req: true },
+      { key: 'insExpiry', label: 'Policy expiry date', type: 'date', req: true },
+    ] },
+  { key: 'vrc', name: 'Vehicle Registration Certificate (VRC)', desc: 'Photo of the logbook, checked against the customer', kinds: ['vehicle'],
+    fields: [
+      { key: 'vrcPhoto', label: 'Photo of the Vehicle Registration Certificate', type: 'photo', req: true, sample: 'doc' },
+      { key: 'vrcOwner', label: 'Is the registered owner on the certificate the customer?', type: 'yesno', req: true },
+    ] },
+  { key: 'tracker', name: 'Proof of immobiliser / tracker fitted', desc: 'Evidence of a tracker or approved immobiliser', kinds: ['vehicle', 'plant'],
+    fields: [
+      { key: 'trackerFitted', label: 'Is a tracker or approved immobiliser fitted?', type: 'yesno', req: true },
+      { key: 'trackerPhoto', label: 'Photo of the tracker / immobiliser or its certificate', type: 'photo', req: true, sample: 'doc', when: a => a.trackerFitted === 'Yes' },
+    ] },
+  { key: 'service', name: 'Service records', desc: 'Service history at the manufacturer intervals', kinds: ['vehicle', 'plant'],
+    fields: [
+      { key: 'serviceUpToDate', label: 'Is the service history up to date?', type: 'yesno', req: true },
+      { key: 'servicePhoto', label: 'Photo of the service book or latest invoice', type: 'photo', req: true, sample: 'doc' },
+    ] },
+  { key: 'keys', name: 'Number of keys present', desc: 'Count and photo of the keys with the asset', kinds: ['vehicle', 'plant'],
+    fields: [
+      { key: 'keysCount', label: 'How many keys are present?', type: 'choice', options: ['1', '2', '3 or more'], req: true },
+      { key: 'keysPhoto', label: 'Photo of all keys together', type: 'photo', req: true, sample: 'keys' },
+    ] },
+];
+
+const ROLES = {
+  Admin:     'Everything, plus inviting and removing colleagues',
+  Reviewer:  'Request inspections, review reports, approve or raise a query',
+  Requester: 'Request inspections and follow their progress (e.g. brokers, sales)',
+};
+
+const AV_COLORS = ['#e6237e', '#1a5aa3', '#3aa635', '#b57800', '#6d2fb0', '#0e8a8a'];
+
+// =====================================================================
+//  Helpers
+// =====================================================================
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pad = n => String(n).padStart(2, '0');
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+function fmtStamp(t) { const d = new Date(t); return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} ${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`; }
+function fmtLong(t) { const d = new Date(t); return `${pad(d.getDate())} ${MONTHS[d.getMonth()]}, ${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+function fmtDate(t) { const d = new Date(t); return `${pad(d.getDate())} ${MONTHS[d.getMonth()].slice(0,3)} ${d.getFullYear()}`; }
+function fmtAgo(t) {
+  const s = (Date.now() - t) / 1000;
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s / 60) + ' min ago';
+  if (s < 86400) return Math.floor(s / 3600) + ' h ago';
+  if (s < 172800) return 'yesterday';
+  return fmtDate(t);
+}
+function initials(name) { return name.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase(); }
+function avatar(u, size) {
+  const i = Math.abs([...u.name].reduce((a, c) => a + c.charCodeAt(0), 0)) % AV_COLORS.length;
+  return `<span class="avatar" style="background:${AV_COLORS[i]};${size ? `width:${size}px;height:${size}px;` : ''}">${initials(u.name)}</span>`;
+}
+function haversineKm(a, b) {
+  const R = 6371, r = x => x * Math.PI / 180;
+  const dLat = r(b.lat - a.lat), dLon = r(b.lon - a.lon);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(r(a.lat)) * Math.cos(r(b.lat)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+const rnd = n => Math.random().toString(36).slice(2, 2 + n);
+const ago = (days, h = 0, m = 0) => { const d = new Date(); d.setDate(d.getDate() - days); if (h || m) d.setHours(h, m, Math.floor(Math.random() * 59)); return d.getTime(); };
+function toast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = msg;
+  $('#toasts').appendChild(el);
+  setTimeout(() => el.remove(), 5200);
+}
+const ICON = {
+  flag: c => `<svg viewBox="0 0 24 24"><path d="M5 22V3h12l-2 4.5L17 12H7v10z" fill="${c}"/></svg>`,
+  pin: c => `<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" fill="${c}"/></svg>`,
+  pinO: `<svg viewBox="0 0 24 24" fill="none" stroke="#3d4553" stroke-width="2"><path d="M12 22s7-8 7-13a7 7 0 0 0-14 0c0 5 7 13 7 13z"/><circle cx="12" cy="9" r="2.5"/></svg>`,
+  warn: `<svg viewBox="0 0 24 24"><path d="M12 2 1 21h22L12 2zm1 15h-2v-2h2v2zm0-4h-2V9h2v4z" fill="#1f2733"/></svg>`,
+  chev: `<svg viewBox="0 0 24 24"><path d="M3 5h8l7 7-7 7H3l7-7z" fill="none" stroke="#1f2733" stroke-width="2"/></svg>`,
+  spoof: c => `<svg viewBox="0 0 24 24"><path d="M12 2 2 21h20L12 2z" fill="${c}"/><text x="12" y="18" font-size="7" font-weight="700" text-anchor="middle" fill="#fff" font-family="Arial">!</text></svg>`,
+  cam: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="4"/></svg>`,
+  leafbox: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1d4d1a" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 17V9m0 3 3-3m-3 5-3-3"/></svg>`,
+};
+
+// =====================================================================
+//  Sample "photos" — drawn on a canvas so the demo works without a camera
+// =====================================================================
+const SAMPLE_CACHE = {};
+const ASSET_COLORS = { car: '#8d939b', lcv: '#f1f2f3', hgv: '#d9dde2', plant: '#f2b705', agri: '#2f8f3a' };
+
+function drawStamp(ctx, w, h, t, gps) {
+  ctx.fillStyle = 'rgba(0,0,0,.55)';
+  ctx.fillRect(0, h - 30, w, 30);
+  ctx.fillStyle = '#fff';
+  ctx.font = '600 14px Inter, Arial';
+  const where = gps ? `${gps.lat.toFixed(5)}, ${gps.lon.toFixed(5)}` : 'location unavailable';
+  ctx.fillText(`${fmtStamp(t)}   •   ${where}`, 10, h - 10);
+}
+
+function samplePhoto(kind, cat, text, t, gps) {
+  const key = [kind, cat, text, t].join('|');
+  if (SAMPLE_CACHE[key]) return SAMPLE_CACHE[key];
+  const W = 640, H = 480;
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d');
+  const col = ASSET_COLORS[cat] || '#8d939b';
+  const plant = CATS[cat] && CATS[cat].kind === 'plant';
+  const rr = (X, Y, w, h, r, fill) => { x.beginPath(); x.roundRect(X, Y, w, h, r); x.fillStyle = fill; x.fill(); };
+  const wheel = (X, Y, r) => { x.beginPath(); x.arc(X, Y, r, 0, 7); x.fillStyle = '#1d1f22'; x.fill(); x.beginPath(); x.arc(X, Y, r * .45, 0, 7); x.fillStyle = '#9aa0a6'; x.fill(); };
+  const scene = () => {
+    let g = x.createLinearGradient(0, 0, 0, H * .58); g.addColorStop(0, '#b9cde0'); g.addColorStop(1, '#e9eef3');
+    x.fillStyle = g; x.fillRect(0, 0, W, H * .58);
+    g = x.createLinearGradient(0, H * .58, 0, H); g.addColorStop(0, '#8e959c'); g.addColorStop(1, '#6b7178');
+    x.fillStyle = g; x.fillRect(0, H * .58, W, H);
+    x.fillStyle = '#c2c9cf'; x.fillRect(0, H * .5, W, 12);
+  };
+  const plate = (X, Y) => { rr(X, Y, 130, 30, 4, '#fff'); x.fillStyle = '#111'; x.font = '700 17px Arial'; x.textAlign = 'center'; x.fillText(text || '', X + 65, Y + 21); x.textAlign = 'left'; };
+
+  if (['front', 'rear', 'right', 'left', 'cab'].includes(kind)) {
+    scene();
+    if (plant) {
+      // tracked machine, side-on
+      rr(110, 300, 400, 70, 35, '#2a2c2f'); [150, 230, 310, 390, 470].forEach(X => wheel(X, 335, 22));
+      rr(150, 230, 300, 75, 8, col);
+      rr(170, 140, 120, 95, 8, col); rr(184, 152, 92, 60, 4, '#2c3e50');
+      x.strokeStyle = col; x.lineWidth = 26; x.lineCap = 'round';
+      const flip = kind === 'left' || kind === 'rear' ? -1 : 1;
+      x.beginPath(); x.moveTo(320 + 100 * flip, 250); x.lineTo(320 + 200 * flip, 150); x.lineTo(320 + 250 * flip, 290); x.stroke();
+      rr(320 + 225 * flip - 30, 285, 60, 40, 6, '#3a3c40');
+    } else if (kind === 'front' || kind === 'rear') {
+      const tall = cat === 'lcv' || cat === 'hgv';
+      rr(140, tall ? 150 : 215, 360, tall ? 205 : 140, 26, col);
+      rr(175, tall ? 165 : 180, 290, tall ? 75 : 70, 16, kind === 'front' ? '#33414f' : '#2b3540');
+      if (kind === 'front') { rr(165, 285, 70, 26, 9, '#f6f7f8'); rr(405, 285, 70, 26, 9, '#f6f7f8'); rr(262, 278, 116, 40, 10, '#26282b'); }
+      else { rr(150, 270, 80, 28, 7, '#c4232c'); rr(410, 270, 80, 28, 7, '#c4232c'); }
+      plate(255, 322); wheel(185, 368, 26); wheel(455, 368, 26);
+    } else {
+      const tall = cat === 'lcv' || cat === 'hgv';
+      rr(70, tall ? 150 : 225, 500, tall ? 190 : 110, 30, col);
+      if (!tall) { x.beginPath(); x.moveTo(190, 228); x.lineTo(250, 160); x.lineTo(420, 160); x.lineTo(480, 228); x.fillStyle = col; x.fill(); }
+      rr(tall ? 90 : 220, tall ? 165 : 172, tall ? 120 : 120, 55, 8, '#33414f');
+      if (!tall) rr(352, 172, 100, 55, 8, '#33414f');
+      wheel(170, 340, 40); wheel(470, 340, 40);
+    }
+  } else if (kind === 'interior') {
+    x.fillStyle = '#1e2226'; x.fillRect(0, 0, W, H);
+    rr(0, 250, W, 230, 0, '#2c3136'); rr(60, 120, 520, 70, 14, '#5c6a78');
+    x.beginPath(); x.arc(220, 330, 95, 0, 7); x.lineWidth = 20; x.strokeStyle = '#111'; x.stroke();
+    rr(360, 270, 170, 100, 10, '#0f1316'); x.fillStyle = '#59b8ff'; x.font = '600 18px Arial'; x.fillText('12:04   21°', 385, 325);
+  } else if (kind === 'vin') {
+    x.fillStyle = '#2b2f33'; x.fillRect(0, 0, W, H);
+    rr(80, 150, 480, 170, 12, '#c9ced3'); rr(92, 162, 456, 146, 8, '#dde1e5');
+    x.fillStyle = '#333'; x.font = '600 18px Arial'; x.fillText(plant ? 'PRODUCT IDENTIFICATION NUMBER' : 'VEHICLE IDENTIFICATION NUMBER', 110, 200);
+    x.font = '700 30px Menlo, Courier, monospace'; x.fillText(text || '', 110, 260);
+    x.font = '14px Arial'; x.fillStyle = '#555'; x.fillText('MADE IN ' + (plant ? 'BELGIUM' : 'GERMANY'), 110, 292);
+  } else if (kind === 'odo') {
+    x.fillStyle = '#121416'; x.fillRect(0, 0, W, H);
+    x.beginPath(); x.arc(320, 230, 170, Math.PI * .8, Math.PI * 2.2); x.lineWidth = 8; x.strokeStyle = '#e9eef3'; x.stroke();
+    rr(200, 280, 240, 56, 8, '#000'); x.fillStyle = '#ffb02e'; x.font = '700 34px Menlo, Courier, monospace'; x.textAlign = 'center'; x.fillText(text || '', 320, 320);
+    x.fillStyle = '#ccc'; x.font = '15px Arial'; x.fillText(plant ? 'HOURS' : 'TOTAL', 320, 268); x.textAlign = 'left';
+  } else if (kind === 'doc') {
+    x.fillStyle = '#7b6a58'; x.fillRect(0, 0, W, H);
+    x.save(); x.translate(320, 240); x.rotate(-.05);
+    rr(-190, -210, 380, 420, 4, '#fbfbf8');
+    x.fillStyle = '#0e2a52'; x.font = '700 20px Arial'; x.fillText(text || 'DOCUMENT', -160, -160);
+    x.fillStyle = '#c9ced3'; for (let i = 0; i < 11; i++) x.fillRect(-160, -120 + i * 28, i % 3 === 2 ? 200 : 320, 9);
+    x.restore();
+  } else if (kind === 'storage') {
+    scene();
+    rr(60, 120, 520, 260, 0, '#b8aa96'); rr(240, 200, 160, 180, 0, '#6d5b45');
+    x.strokeStyle = '#222'; x.lineWidth = 6;
+    for (let i = 0; i < 16; i++) { x.beginPath(); x.moveTo(30 + i * 38, 250); x.lineTo(30 + i * 38, 400); x.stroke(); }
+    x.beginPath(); x.moveTo(20, 260); x.lineTo(620, 260); x.moveTo(20, 390); x.lineTo(620, 390); x.stroke();
+  } else if (kind === 'keys') {
+    x.fillStyle = '#6e4f33'; x.fillRect(0, 0, W, H);
+    const k = (X, Y, r) => { x.save(); x.translate(X, Y); x.rotate(r); rr(-30, -45, 60, 90, 18, '#1b1d20'); rr(-8, 45, 16, 90, 3, '#c0c4c9'); x.restore(); };
+    k(230, 200, -.3); k(380, 220, .25); if (text === '3') k(310, 300, 1.2);
+  }
+  drawStamp(x, W, H, t || Date.now(), gps);
+  return (SAMPLE_CACHE[key] = c.toDataURL('image/jpeg', .72));
+}
+
+// seeded photos are stored as "sample:<kind>:<text>" and drawn on demand
+function photoSrc(rec, p) {
+  if (!p) return '';
+  if (p.src && p.src.startsWith('sample:')) {
+    const [, kind, text] = p.src.split(':');
+    return samplePhoto(kind, rec.category, text, p.t, p.lat != null ? { lat: p.lat, lon: p.lon } : null);
+  }
+  return p.src;
+}
+
+// =====================================================================
+//  Inspection questions (one schema drives the link flow AND the report)
+// =====================================================================
+function buildSteps(rec) {
+  const cat = CATS[rec.category];
+  const veh = cat.kind === 'vehicle';
+  const noun = cat.noun, Noun = noun[0].toUpperCase() + noun.slice(1);
+  const sides = veh
+    ? [['front', 'front', 'Front', 'front'], ['rear', 'rear', 'Rear', 'rear'], ['right', 'right hand side', 'Right Side', 'right'], ['left', 'left hand side', 'Left Side', 'left'], ['interior', 'interior', 'Interior', 'interior']]
+    : [['front', 'front', 'Front', 'front'], ['rear', 'rear', 'Rear', 'rear'], ['right', 'right hand side', 'Right Side', 'right'], ['left', 'left hand side', 'Left Side', 'left'], ['cab', 'cab / operator station', 'Cab', 'interior']];
+
+  const steps = [
+    { key: 'site', title: 'Inspection location', intro: `Confirm the address where the ${noun} is right now. Your phone's location is recorded alongside it.`,
+      fields: [{ key: 'siteAddress', label: 'Address where the asset is being inspected', type: 'textarea', req: true }] },
+    { key: 'asset', title: 'Asset Details',
+      fields: [
+        { key: 'make', label: 'Manufacturer', type: 'text', req: true },
+        { key: 'model', label: 'Model', type: 'text', req: true },
+        { key: 'year', label: 'Year of Manufacture', type: 'number', req: true },
+        veh ? { key: 'reg', label: 'Registration Number', type: 'text', req: true, upper: true, check: 'reg' }
+            : { key: 'fleetNo', label: 'Fleet / ID number (if any)', type: 'text' },
+        { key: 'working', label: `Was the ${noun} working?`, type: 'yesno', req: true },
+      ] },
+    { key: 'vin', title: veh ? 'VIN/Chassis Number' : 'Serial / PIN Plate',
+      fields: [
+        { key: 'vin', label: veh ? 'VIN/Chassis Number' : 'Serial / PIN number', type: 'text', req: true, upper: true, check: 'vin' },
+        { key: 'vinPhoto', label: veh ? 'Take photo of VIN number' : 'Take photo of the serial plate', type: 'photo', req: true, sample: 'vin', sampleText: a => a.vin },
+        { key: 'vinTamper', label: `Is there evidence of ${veh ? 'VIN' : 'serial plate'} tampering?`, type: 'yesno', req: true },
+      ] },
+    veh
+      ? { key: 'meter', title: 'Mileage/Odometer',
+          fields: [
+            { key: 'odoUnit', label: 'What is unit used', type: 'choice', options: ['Kms', 'Miles'], req: true },
+            { key: 'odo', label: 'Odometer Reading', type: 'number', req: true },
+            { key: 'odoPhoto', label: 'Odometer Reading Photo', type: 'photo', req: true, sample: 'odo', sampleText: a => String(a.odo || '').padStart(6, '0') + ' ' + (a.odoUnit === 'Miles' ? 'mi' : 'km') },
+          ] }
+      : { key: 'meter', title: 'Hour Meter',
+          fields: [
+            { key: 'hours', label: 'Hour meter reading', type: 'number', req: true },
+            { key: 'hoursPhoto', label: 'Hour meter photo', type: 'photo', req: true, sample: 'odo', sampleText: a => String(a.hours || '').padStart(6, '0') },
+          ] },
+    { key: 'cond', title: `${Noun} Condition`,
+      fields: sides.flatMap(([k, l, L, sample]) => [
+        { key: 'cond_' + k, label: `What is the condition of the ${l} of the ${noun}`, type: 'choice', options: ['Good', 'Fair', 'Poor', 'Damaged'], req: true },
+        { key: 'photo_' + k, label: `${Noun} condition photo (${L})`, type: 'photo', req: true, sample, sampleText: a => a.reg || '' },
+      ]) },
+    { key: 'docs', title: 'Documents',
+      fields: [
+        { key: 'pop', label: 'Is the proof of purchase document (supplier invoice or bill of sale) present?', type: 'yesno', req: true,
+          note: a => a.pop === 'No' ? 'The response indicates that there is no proof of purchase available with the asset at the time of inspection. If this is required by the lender, further investigation is advisable.' : '' },
+        { key: 'popPhoto', label: 'Photo of the proof of purchase', type: 'photo', req: true, sample: 'doc', sampleText: () => 'INVOICE', when: a => a.pop === 'Yes' },
+        { key: 'popWhy', label: 'Proof of Purchase Document (invoice/bill of sale) not present - explanation', type: 'textarea', req: true, when: a => a.pop === 'No' },
+      ] },
+    { key: 'storage', title: 'Storage & Security',
+      fields: [
+        { key: 'storedWhere', label: `Where is the ${noun} usually stored?`, type: 'choice', req: true,
+          options: veh ? ['Secure Driveway', 'Locked Garage', 'Secure Yard / Compound', 'On-street'] : ['Secure Yard / Compound', 'Locked Shed / Building', 'On Site (active job)', 'Other'] },
+        { key: 'secured', label: 'Description of how entry to building or driveway is physically secured', type: 'text', req: true },
+        { key: 'storagePhoto', label: 'Please take photos of building or driveway where asset is stored.', type: 'photo', req: true, sample: 'storage' },
+      ] },
+  ];
+
+  const chosen = BOLTONS.filter(b => (rec.boltOns || []).includes(b.key) && b.kinds.includes(cat.kind));
+  if (chosen.length) {
+    steps.push({ key: 'bolt', title: 'Additional checks', intro: 'Capitalflow asked for these extra checks on this asset.',
+      fields: chosen.flatMap(b => b.fields.map(f => ({ ...f, sampleText: f.sampleText || (() => b.name.toUpperCase().slice(0, 26)) }))) });
+  }
+  return steps;
+}
+
+const visible = (f, a) => !f.when || f.when(a);
+
+// =====================================================================
+//  Flags, location checks and impact numbers
+// =====================================================================
+const norm = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+function siteCoords(rec) { return rec.siteCoords || rec.expectedCoords; }
+
+function computeFlags(rec) {
+  const red = [], amber = [], spoof = [], loc = {};
+  if (!rec.answers || rec.status !== 'completed') return { red, amber, spoof, loc };
+  const a = rec.answers;
+  const site = siteCoords(rec);
+
+  if (!rec.gps) {
+    red.push('The inspector\'s device did not share its location, so where the inspection took place can\'t be confirmed.');
+  } else if (site) {
+    const km = haversineKm(site, rec.gps);
+    loc.km = km;
+    if (km > 1.5) {
+      loc.mismatch = true;
+      (km > 50 ? red : amber).push(`Location mismatch: the inspection was performed ${km.toFixed(1)} km from the address the inspector entered.`);
+    }
+  }
+  if (rec.asset.vin && a.vin && norm(rec.asset.vin) !== norm(a.vin)) red.push(`VIN/serial entered (${a.vin}) does not match the record on file (${rec.asset.vin}).`);
+  if (rec.asset.reg && a.reg && norm(rec.asset.reg) !== norm(a.reg)) amber.push(`Registration entered (${a.reg}) does not match the record on file (${rec.asset.reg}).`);
+  if (a.vinTamper === 'Yes') red.push('Inspector reported evidence of VIN/serial tampering.');
+  if (a.working === 'No') amber.push('Inspector reported the asset was not working.');
+  Object.keys(a).filter(k => k.startsWith('cond_')).forEach(k => {
+    if (a[k] === 'Poor' || a[k] === 'Damaged') amber.push(`Condition reported as ${a[k]} (${k.slice(5)}).`);
+  });
+  if (a.vrcOwner === 'No') amber.push('Registered owner on the VRC is not the customer.');
+  if (a.trackerFitted === 'No') amber.push('No tracker / immobiliser fitted.');
+
+  Object.entries(rec.photos || {}).forEach(([k, p]) => {
+    if (p.live === false) spoof.push(`Photo "${fieldLabel(rec, k)}" was not taken live — the file was created before this inspection started (uploaded from the gallery).`);
+    else if (rec.gps && p.lat != null && haversineKm(rec.gps, { lat: p.lat, lon: p.lon }) > 1) spoof.push(`Photo "${fieldLabel(rec, k)}" was taken away from the inspection location.`);
+  });
+  return { red, amber, spoof, loc };
+}
+
+function fieldLabel(rec, key) {
+  for (const s of buildSteps(rec)) for (const f of s.fields) if (f.key === key) return f.label;
+  return key;
+}
+
+function impact(rec) {
+  if (!rec.gps) return null;
+  const km = haversineKm(HQ, rec.gps) * 1.25 * 2;   // round trip by road
+  if (km < 10) return null;                          // too close to head office to be worth showing
+  const co2 = km * 0.171;                            // kg
+  const hours = km / 65 + 1;                         // driving + an hour on site
+  const fuel = km * 0.31;
+  return { km, co2, trees: co2 / 22, credit: co2 / 1000 * 70, hours, fuel, expenses: 15, saving: fuel + 15 };
+}
+
+// =====================================================================
+//  Seed data (the demo always opens with a realistic team and queue)
+// =====================================================================
+const SEED_TEAM = [
+  { id: 'u1', name: 'Aoife Byrne', email: 'aoife.byrne@capitalflow.ie', title: 'Credit Manager', role: 'Admin', lastActive: ago(0) },
+  { id: 'u2', name: 'Conor Walsh', email: 'conor.walsh@capitalflow.ie', title: 'Underwriter', role: 'Reviewer', lastActive: ago(0) },
+  { id: 'u3', name: 'Sinéad Murphy', email: 'sinead.murphy@capitalflow.ie', title: 'Operations', role: 'Requester', lastActive: ago(1) },
+  { id: 'u4', name: 'Mark Doyle', email: 'mark@fleetlinebrokers.ie', title: 'Broker partner (external)', role: 'Requester', lastActive: ago(2) },
+];
+
+function seedPhotos(keys, t0, gps, extra = {}) {
+  const out = {};
+  keys.forEach(([k, kind, text], i) => {
+    out[k] = { src: `sample:${kind}:${text || ''}`, t: t0 + i * 14000, lat: gps.lat + (Math.random() - .5) * .0003, lon: gps.lon + (Math.random() - .5) * .0003, live: true, ...(extra[k] || {}) };
+  });
+  return out;
+}
+
+function buildSeeds() {
+  const list = [];
+
+  // 1 — mirrors the sample report: BMW, location mismatch (amber), awaiting review
+  {
+    const t0 = ago(1, 13, 50), gps = { lat: 53.24840, lon: -6.59701 };
+    list.push({
+      id: '14305', token: 'k7Qm2xRb', proposalRef: 'CF-PR-24817', customer: 'Declan Moran', category: 'car',
+      asset: { make: 'BMW', model: '530e', reg: '252-D-10488', vin: 'WBA71FJ050CX24811' },
+      expectedAddress: 'Unit 4, Ballymount Business Park, Dublin 12, D12 X2T7', expectedCoords: { lat: 53.3170, lon: -6.3500 },
+      inspector: { role: 'Customer', name: 'Declan Moran', mobile: '087 555 0148', email: 'declan.moran@example.ie' },
+      boltOns: [], createdBy: 'u3', reviewer: 'u2', createdAt: ago(1, 11, 2), dueAt: ago(-4),
+      status: 'completed', startedAt: t0 - 60000, completedAt: t0 + 190000, step: 7,
+      gps: { ...gps, acc: 9 }, siteCoords: { lat: 53.3170, lon: -6.3500 },
+      ips: ['86.45.112.20', '2a02:8084:4c1:a00::12', '2a02:8084:4c1:a00::5f'],
+      answers: { siteAddress: 'Unit 4, Ballymount Business Park, Dublin 12, D12 X2T7', make: 'BMW', model: '530e', year: '2025', reg: '252-D-10488', working: 'Yes',
+        vin: 'WBA71FJ050CX24811', vinTamper: 'No', odoUnit: 'Kms', odo: '15689',
+        cond_front: 'Good', cond_rear: 'Good', cond_right: 'Good', cond_left: 'Good', cond_interior: 'Good',
+        pop: 'No', popWhy: 'Not required — vehicle supplied new by the dealer', storedWhere: 'Secure Driveway', secured: 'Electric gates (driveway)' },
+      photos: seedPhotos([['vinPhoto', 'vin', 'WBA71FJ050CX24811'], ['odoPhoto', 'odo', '015689 km'], ['photo_front', 'front', '252-D-10488'], ['photo_rear', 'rear', '252-D-10488'],
+        ['photo_right', 'right'], ['photo_left', 'left'], ['photo_interior', 'interior'], ['storagePhoto', 'storage']], t0, gps),
+      reviewStatus: null, comments: [
+        { by: 'u3', t: ago(0, 9, 12), text: 'Customer says he was at his parents\' place in Kildare when he did it. Conor — happy to accept or do we want a re-inspection at the business address?' },
+      ],
+      events: [
+        { t: ago(1, 11, 2), by: 'Sinéad Murphy', text: 'Inspection requested — link sent by SMS and email to Declan Moran' },
+        { t: t0 - 90000, by: 'Inspector', text: 'Link opened' },
+        { t: t0 - 60000, by: 'Inspector', text: 'Inspection started' },
+        { t: t0 + 190000, by: 'Inspector', text: 'Inspection submitted' },
+        { t: ago(0, 9, 12), by: 'Sinéad Murphy', text: 'Added a comment' },
+      ],
+    });
+  }
+
+  // 2 — plant, approved, clean
+  {
+    const t0 = ago(2, 10, 14), gps = { lat: 53.32735, lon: -6.33045 };
+    list.push({
+      id: '14304', token: 'p3Lw9cZe', proposalRef: 'CF-PR-24790', customer: 'Naas Rd Plant Hire Ltd', category: 'plant',
+      asset: { make: 'Caterpillar', model: '320 GC', vin: 'CAT0320GJWK12345' },
+      expectedAddress: 'Naas Road Depot, Clondalkin, Dublin 22', expectedCoords: { lat: 53.3272, lon: -6.3306 },
+      inspector: { role: 'Dealer', name: 'Tom Byrne (Byrne Plant Sales)', mobile: '086 555 0192', email: 'tom@byrneplant.example.ie' },
+      boltOns: ['insurance', 'tracker'], createdBy: 'u2', reviewer: 'u2', createdAt: ago(3, 15, 40), dueAt: ago(2),
+      status: 'completed', startedAt: t0 - 30000, completedAt: t0 + 240000, step: 8,
+      gps: { ...gps, acc: 6 }, siteCoords: { lat: 53.3272, lon: -6.3306 }, ips: ['109.78.201.33'],
+      answers: { siteAddress: 'Naas Road Depot, Clondalkin, Dublin 22', make: 'Caterpillar', model: '320 GC', year: '2024', fleetNo: 'NRP-118', working: 'Yes',
+        vin: 'CAT0320GJWK12345', vinTamper: 'No', hours: '412',
+        cond_front: 'Good', cond_rear: 'Good', cond_right: 'Fair', cond_left: 'Good', cond_cab: 'Good',
+        pop: 'Yes', storedWhere: 'Secure Yard / Compound', secured: 'Palisade fencing, locked gate, CCTV',
+        insurer: 'Allianz Ireland', insExpiry: '2027-03-31', trackerFitted: 'Yes' },
+      photos: seedPhotos([['vinPhoto', 'vin', 'CAT0320GJWK12345'], ['hoursPhoto', 'odo', '000412'], ['photo_front', 'front'], ['photo_rear', 'rear'], ['photo_right', 'right'],
+        ['photo_left', 'left'], ['photo_cab', 'interior'], ['popPhoto', 'doc', 'INVOICE'], ['storagePhoto', 'storage'], ['insPhoto', 'doc', 'CERTIFICATE OF INSURANCE'], ['trackerPhoto', 'doc', 'TRACKER CERTIFICATE']], t0, gps),
+      reviewStatus: 'approved', reviewedBy: 'u2', reviewedAt: ago(2, 14, 5), comments: [],
+      events: [
+        { t: ago(3, 15, 40), by: 'Conor Walsh', text: 'Inspection requested — link sent to Tom Byrne (dealer)' },
+        { t: t0 - 30000, by: 'Inspector', text: 'Inspection started' },
+        { t: t0 + 240000, by: 'Inspector', text: 'Inspection submitted' },
+        { t: ago(2, 14, 5), by: 'Conor Walsh', text: 'Approved the inspection' },
+      ],
+    });
+  }
+
+  // 3 — link sent, not opened yet
+  list.push({
+    id: '14306', token: 'v8Tn4hYs', proposalRef: 'CF-PR-24833', customer: 'Nolan Courier Services', category: 'lcv',
+    asset: { make: 'Ford', model: 'Transit Custom', reg: '242-KE-3391', vin: 'WF0YXXTTGYPS41827' },
+    expectedAddress: '12 Main Street, Naas, Co. Kildare, W91 K2P8', expectedCoords: { lat: 53.2158, lon: -6.6669 },
+    inspector: { role: 'Broker', name: 'Mark Doyle (Fleetline Brokers)', mobile: '085 555 0110', email: 'mark@fleetlinebrokers.ie' },
+    boltOns: ['vrc', 'keys'], createdBy: 'u4', reviewer: 'u2', createdAt: ago(0, 8, 41), dueAt: ago(-5),
+    status: 'sent', answers: {}, photos: {}, comments: [],
+    events: [{ t: ago(0, 8, 41), by: 'Mark Doyle', text: 'Inspection requested — link sent by SMS to Mark Doyle (broker)' }],
+  });
+
+  // 4 — in progress right now
+  {
+    const t0 = Date.now() - 6 * 60000, gps = { lat: 51.8979, lon: -8.4752 };
+    list.push({
+      id: '14307', token: 'c2Hd6uWa', proposalRef: 'CF-PR-24838', customer: 'Munster Groundworks Ltd', category: 'plant',
+      asset: { make: 'Volvo', model: 'L60H', vin: 'VCEL60HAV00022098' },
+      expectedAddress: 'Kinsale Road Yard, Cork, T12 X5N2', expectedCoords: { lat: 51.8985, lon: -8.4756 },
+      inspector: { role: 'Customer', name: 'Pádraig Walsh', mobile: '087 555 0177', email: 'padraig@munstergw.example.ie' },
+      boltOns: ['service'], createdBy: 'u3', reviewer: 'u1', createdAt: ago(0, 7, 55), dueAt: ago(-3),
+      status: 'in_progress', startedAt: t0, step: 3, gps: { ...gps, acc: 14 }, ips: ['37.228.240.17'],
+      answers: { siteAddress: 'Kinsale Road Yard, Cork, T12 X5N2', make: 'Volvo', model: 'L60H', year: '2023', working: 'Yes', vin: 'VCEL60HAV00022098', vinTamper: 'No', hours: '1870' },
+      photos: seedPhotos([['vinPhoto', 'vin', 'VCEL60HAV00022098'], ['hoursPhoto', 'odo', '001870']], t0, gps), comments: [],
+      events: [
+        { t: ago(0, 7, 55), by: 'Sinéad Murphy', text: 'Inspection requested — link sent to Pádraig Walsh' },
+        { t: t0, by: 'Inspector', text: 'Inspection started' },
+      ],
+    });
+  }
+
+  // 5 — red flags: VIN mismatch, photo from gallery; query raised
+  {
+    const t0 = ago(3, 16, 2), gps = { lat: 53.3449, lon: -6.2671 };
+    list.push({
+      id: '14301', token: 'm5Rf1kPq', proposalRef: 'CF-PR-24702', customer: 'Liffey Logistics Ltd', category: 'lcv',
+      asset: { make: 'Mercedes-Benz', model: 'Sprinter 317', reg: '231-D-22610', vin: 'WDB9066331R123456' },
+      expectedAddress: 'North Wall Quay, Dublin 1', expectedCoords: { lat: 53.3474, lon: -6.2440 },
+      inspector: { role: 'Customer', name: 'Gavin Reilly', mobile: '083 555 0163', email: 'gavin@liffeylogistics.example.ie' },
+      boltOns: ['keys'], createdBy: 'u1', reviewer: 'u2', createdAt: ago(4, 12, 0), dueAt: ago(1),
+      status: 'completed', startedAt: t0 - 20000, completedAt: t0 + 200000, step: 8,
+      gps: { ...gps, acc: 11 }, siteCoords: { lat: 53.3452, lon: -6.2668 }, ips: ['89.101.45.7'],
+      answers: { siteAddress: 'Ormond Quay Upper car park, Dublin 7', make: 'Mercedes-Benz', model: 'Sprinter 317', year: '2023', reg: '231-D-22610', working: 'Yes',
+        vin: 'WDB9066331R128844', vinTamper: 'No', odoUnit: 'Kms', odo: '48210',
+        cond_front: 'Good', cond_rear: 'Damaged', cond_right: 'Fair', cond_left: 'Good', cond_interior: 'Fair',
+        pop: 'Yes', storedWhere: 'Secure Yard / Compound', secured: 'Shared yard, barrier at entrance', keysCount: '1' },
+      photos: seedPhotos([['vinPhoto', 'vin', 'WDB9066331R128844'], ['odoPhoto', 'odo', '048210 km'], ['photo_front', 'front', '231-D-22610'], ['photo_rear', 'rear', '231-D-22610'],
+        ['photo_right', 'right'], ['photo_left', 'left'], ['photo_interior', 'interior'], ['popPhoto', 'doc', 'INVOICE'], ['storagePhoto', 'storage'], ['keysPhoto', 'keys', '1']], t0, gps,
+        { photo_rear: { live: false, t: ago(40, 11, 20) } }),
+      reviewStatus: 'query', reviewedBy: 'u2', reviewedAt: ago(2, 9, 30), queryReason: 'VIN on the van doesn\'t match the invoice and the rear photo was uploaded from the camera roll. Please re-inspect with the customer present.',
+      comments: [{ by: 'u2', t: ago(2, 9, 30), text: 'VIN on the van doesn\'t match the invoice and the rear photo was uploaded from the camera roll. Please re-inspect with the customer present.' }],
+      events: [
+        { t: ago(4, 12, 0), by: 'Aoife Byrne', text: 'Inspection requested — link sent to Gavin Reilly' },
+        { t: t0 + 200000, by: 'Inspector', text: 'Inspection submitted' },
+        { t: ago(2, 9, 30), by: 'Conor Walsh', text: 'Raised a query' },
+      ],
+    });
+  }
+
+  // 6 — approved, clean, older
+  {
+    const t0 = ago(6, 11, 31), gps = { lat: 52.6638, lon: -8.6267 };
+    list.push({
+      id: '14300', token: 'q9Ws3nLd', proposalRef: 'CF-PR-24655', customer: 'Shannon Agri Contractors', category: 'agri',
+      asset: { make: 'John Deere', model: '6R 155', vin: '1L06155RXPP123987' },
+      expectedAddress: 'Ballysimon Road, Limerick, V94 E2X1', expectedCoords: { lat: 52.6640, lon: -8.6270 },
+      inspector: { role: 'Dealer', name: 'Midwest Tractors Ltd', mobile: '061 555 0120', email: 'sales@midwesttractors.example.ie' },
+      boltOns: [], createdBy: 'u1', reviewer: 'u1', createdAt: ago(7, 9, 15), dueAt: ago(3),
+      status: 'completed', startedAt: t0 - 20000, completedAt: t0 + 260000, step: 7,
+      gps: { ...gps, acc: 7 }, siteCoords: { lat: 52.6640, lon: -8.6270 }, ips: ['78.143.22.9'],
+      answers: { siteAddress: 'Ballysimon Road, Limerick, V94 E2X1', make: 'John Deere', model: '6R 155', year: '2025', working: 'Yes',
+        vin: '1L06155RXPP123987', vinTamper: 'No', hours: '96', cond_front: 'Good', cond_rear: 'Good', cond_right: 'Good', cond_left: 'Good', cond_cab: 'Good',
+        pop: 'Yes', storedWhere: 'Locked Shed / Building', secured: 'Roller door with padlock, alarmed' },
+      photos: seedPhotos([['vinPhoto', 'vin', '1L06155RXPP123987'], ['hoursPhoto', 'odo', '000096'], ['photo_front', 'front'], ['photo_rear', 'rear'], ['photo_right', 'right'],
+        ['photo_left', 'left'], ['photo_cab', 'interior'], ['popPhoto', 'doc', 'INVOICE'], ['storagePhoto', 'storage']], t0, gps),
+      reviewStatus: 'approved', reviewedBy: 'u1', reviewedAt: ago(6, 15, 0), comments: [],
+      events: [
+        { t: ago(7, 9, 15), by: 'Aoife Byrne', text: 'Inspection requested — link sent to Midwest Tractors Ltd (dealer)' },
+        { t: t0 + 260000, by: 'Inspector', text: 'Inspection submitted' },
+        { t: ago(6, 15, 0), by: 'Aoife Byrne', text: 'Approved the inspection' },
+      ],
+    });
+  }
+  return list;
+}
+
+// =====================================================================
+//  Storage: shared server API, falling back to this browser only
+// =====================================================================
+const LS_KEY = 'cfi.overrides.v1';
+const LS_TEAM = 'cfi.team.v1';
+let SERVER = true;
+let DB = { insp: {}, team: SEED_TEAM.map(u => ({ ...u })) };
+let SEEDS = {};
+
+function lsGet(k, d) { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+
+async function fetchRemote() {
+  if (SERVER) {
+    try {
+      const [ins, team] = await Promise.all([
+        fetch('/api/inspections', { cache: 'no-store' }).then(r => { if (!r.ok) throw 0; return r.json(); }),
+        fetch('/api/kv/team', { cache: 'no-store' }).then(r => r.json()),
+      ]);
+      return { ins, team };
+    } catch (e) { SERVER = false; }
+  }
+  return { ins: Object.values(lsGet(LS_KEY, {})), team: lsGet(LS_TEAM, null) };
+}
+
+// returns the ids whose record changed since the last load
+async function loadAll() {
+  const { ins, team } = await fetchRemote();
+  const next = {};
+  Object.values(SEEDS).forEach(s => next[s.id] = s);
+  (ins || []).forEach(r => next[r.id] = r);
+  const changed = Object.keys(next).filter(id => DB.insp[id] && (DB.insp[id].updatedAt || 0) !== (next[id].updatedAt || 0));
+  DB.insp = next;
+  if (team && team.length) DB.team = team;
+  return changed.map(id => ({ before: PREV[id], after: next[id] }));
+}
+let PREV = {};
+
+async function saveRec(rec, fromInspector) {
+  rec.updatedAt = Date.now();
+  DB.insp[rec.id] = rec;
+  if (SERVER) {
+    try {
+      const r = await fetch('/api/inspections/' + rec.id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...rec, _fromInspector: !!fromInspector }) });
+      if (r.ok) { DB.insp[rec.id] = await r.json(); return DB.insp[rec.id]; }
+    } catch (e) { SERVER = false; }
+  }
+  const all = lsGet(LS_KEY, {}); all[rec.id] = rec; lsSet(LS_KEY, all);
+  return rec;
+}
+
+async function saveTeam() {
+  if (SERVER) {
+    try { await fetch('/api/kv/team', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(DB.team) }); return; } catch (e) {}
+  }
+  lsSet(LS_TEAM, DB.team);
+}
+
+// read-modify-write so the office and the inspector don't overwrite each other
+async function mutate(id, fn, fromInspector) {
+  if (SERVER) {
+    try {
+      const r = await fetch('/api/inspections/' + id, { cache: 'no-store' });
+      if (r.ok) DB.insp[id] = await r.json();
+    } catch (e) {}
+  } else {
+    const all = lsGet(LS_KEY, {}); if (all[id]) DB.insp[id] = all[id];
+  }
+  const rec = JSON.parse(JSON.stringify(DB.insp[id]));
+  fn(rec);
+  return saveRec(rec, fromInspector);
+}
+
+async function resetDemo() {
+  if (!confirm('Reset the demo? This clears every inspection and comment added since it was deployed, for everyone viewing it.')) return;
+  if (SERVER) { try { await fetch('/api/inspections', { method: 'DELETE' }); } catch (e) {} }
+  localStorage.removeItem(LS_KEY); localStorage.removeItem(LS_TEAM);
+  location.hash = '#/inspections';
+  location.reload();
+}
+
+// =====================================================================
+//  Session (per tab, so two tabs can be two different colleagues)
+// =====================================================================
+function me() { const id = sessionStorage.getItem('cfi.user'); return DB.team.find(u => u.id === id) || null; }
+function userById(id) { return DB.team.find(u => u.id === id) || { name: 'Former user', id, role: '' }; }
+function signIn(id) { sessionStorage.setItem('cfi.user', id); const u = userById(id); u.lastActive = Date.now(); saveTeam(); }
+
+// =====================================================================
+//  Status helpers
+// =====================================================================
+function statusOf(r) {
+  if (r.status === 'cancelled') return ['cancelled', 'Cancelled', 'p-cancelled'];
+  if (r.status === 'sent') return ['awaiting', 'Link sent', 'p-sent'];
+  if (r.status === 'opened') return ['awaiting', 'Link opened', 'p-sent'];
+  if (r.status === 'in_progress') return ['progress', 'In progress', 'p-progress'];
+  if (r.reviewStatus === 'approved') return ['approved', 'Approved', 'p-approved'];
+  if (r.reviewStatus === 'query') return ['query', 'Query raised', 'p-query'];
+  return ['review', 'Ready for review', 'p-review'];
+}
+const pill = r => { const [, l, c] = statusOf(r); return `<span class="pill ${c}">${l}</span>`; };
+
+function flagChips(r) {
+  if (r.status !== 'completed') return '<span class="muted">—</span>';
+  const f = computeFlags(r);
+  if (!f.red.length && !f.amber.length && !f.spoof.length) return `<span class="fl ok">${ICON.flag('#3aa635')} Clear</span>`;
+  return `<span class="flags">
+    ${f.red.length ? `<span class="fl r" title="Red flags">${ICON.flag('#d6303a')}${f.red.length}</span>` : ''}
+    ${f.amber.length ? `<span class="fl a" title="Amber flags">${ICON.flag('#e9a21b')}${f.amber.length}</span>` : ''}
+    ${f.spoof.length ? `<span class="fl s" title="Spoof alerts">${ICON.spoof('#6d2fb0')}${f.spoof.length}</span>` : ''}
+  </span>`;
+}
+
+function assetName(r) { return `${r.asset.make} ${r.asset.model}`.trim(); }
+function assetId(r) { return r.asset.reg || r.asset.vin || ''; }
+function linkFor(r) {
+  return location.protocol === 'file:' ? `${location.href.split('#')[0]}#/i/${r.token}` : `${location.origin}/i/${r.token}`;
+}
+
+// =====================================================================
+//  Router
+// =====================================================================
+let VIEW = { name: '', mapObj: null };
+
+function route() {
+  if (VIEW.mapObj) { VIEW.mapObj.remove(); VIEW.mapObj = null; }
+  const path = location.pathname;
+  const h = location.hash.replace(/^#\/?/, '').split('/');
+  if (path.startsWith('/i/')) return Inspector.open(path.split('/')[2]);
+  if (h[0] === 'i') return Inspector.open(h[1]);
+  if (!me()) return renderLogin();
+  VIEW.name = h[0] || 'inspections';
+  VIEW.arg = h[1];
+  if (VIEW.name === 'new') return renderNew();
+  if (VIEW.name === 'sent') return renderSent(h[1]);
+  if (VIEW.name === 'report') return renderReport(h[1]);
+  if (VIEW.name === 'team') return renderTeam();
+  VIEW.name = 'inspections';
+  return renderDashboard();
+}
+window.addEventListener('hashchange', route);
+
+// live updates: poll the shared API and refresh the screens that show status
+async function poll() {
+  if (Inspector.active || !me()) return;
+  const before = JSON.parse(JSON.stringify(DB.insp));
+  PREV = before;
+  const changes = await loadAll();
+  if (!changes.length) return;
+  changes.forEach(({ before: b, after: a }) => {
+    if (!b) return;
+    if (b.status !== a.status) {
+      const who = a.inspector.name;
+      if (a.status === 'opened') toast(`🔗 <b>${esc(who)}</b> opened the link for #${a.id}`);
+      if (a.status === 'in_progress' && b.status !== 'in_progress') toast(`📷 <b>${esc(who)}</b> started inspection #${a.id}`);
+      if (a.status === 'completed') toast(`✅ Inspection <b>#${a.id}</b> submitted — ready for review`);
+    } else if (a.status === 'in_progress' && a.step !== b.step) {
+      toast(`📷 #${a.id}: ${esc(a.inspector.name)} is on step ${a.step + 1}`);
+    }
+  });
+  const typing = document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
+  if (!typing && ['inspections', 'sent', 'report'].includes(VIEW.name)) route();
+}
+window.addEventListener('storage', e => { if (e.key === LS_KEY) poll(); });
+
+// =====================================================================
+//  Staff shell
+// =====================================================================
+function shell(inner) {
+  const u = me();
+  const nav = [['inspections', 'Inspections'], ['new', 'New request'], ['team', 'Team']];
+  $('#app').innerHTML = `
+    <div class="topbar"><div class="topbar-in">
+      <a href="#/inspections" class="logo-pill"><img src="${LOGO}" alt="Capitalflow"></a>
+      <nav class="nav">${nav.map(([k, l]) => `<a href="#/${k}" class="${VIEW.name === k || (k === 'inspections' && ['sent', 'report'].includes(VIEW.name)) ? 'active' : ''}">${l}</a>`).join('')}</nav>
+      <span class="live ${SERVER ? '' : 'off'}" title="${SERVER ? 'Shared with everyone on the team in real time' : 'Offline: saved in this browser only'}"><i></i>${SERVER ? 'Live · shared with team' : 'This browser only'}</span>
+      <div class="usermenu">
+        <button class="userbtn" id="userBtn">${avatar(u)}<span><b>${esc(u.name)}</b><small>${esc(u.role)} · ${esc(u.title)}</small></span></button>
+        <div class="dropdown hidden" id="userDd">
+          <div class="dd-h">Switch user (demo)</div>
+          ${DB.team.filter(t => t.id !== u.id).map(t => `<button data-sw="${t.id}">${avatar(t, 24)}<span>${esc(t.name)}<br><small class="muted">${esc(t.role)}</small></span></button>`).join('')}
+          <hr><button id="resetBtn">↺ Reset demo data</button>
+          <button id="outBtn">Sign out</button>
+        </div>
+      </div>
+    </div></div>
+    <main class="main">${inner}</main>`;
+  $('#userBtn').onclick = e => { e.stopPropagation(); $('#userDd').classList.toggle('hidden'); };
+  document.onclick = () => { const d = $('#userDd'); if (d) d.classList.add('hidden'); };
+  document.querySelectorAll('[data-sw]').forEach(b => b.onclick = () => { signIn(b.dataset.sw); toast(`Signed in as <b>${esc(me().name)}</b>`); route(); });
+  $('#outBtn').onclick = () => { sessionStorage.removeItem('cfi.user'); location.hash = '#/'; route(); };
+  $('#resetBtn').onclick = resetDemo;
+}
+
+// =====================================================================
+//  Login
+// =====================================================================
+function renderLogin() {
+  $('#app').innerHTML = `
+    <div class="login-wrap">
+      <div class="login-l">
+        <div class="logo-pill" style="align-self:flex-start;"><img src="${LOGO}" alt="Capitalflow" style="height:30px;"></div>
+        <div>
+          <h1>Remote asset inspections</h1>
+          <p>Send the customer, dealer or broker a secure link. They inspect the asset on their own phone — no app to download — and your team gets a verified, geo-stamped report.</p>
+          <ul>
+            <li>Works in any phone browser from an SMS or email link</li>
+            <li>Live photos only, time and GPS stamped</li>
+            <li>Red / amber flags and location checks on every report</li>
+            <li>One shared workspace for the whole credit team</li>
+          </ul>
+        </div>
+        <div class="small" style="color:#8ea2bf;">Demo prepared by DMC Consultancy for Capitalflow Commercial Finance</div>
+      </div>
+      <div class="login-r"><div class="login-card">
+        <h1 style="font-size:22px;">Sign in</h1>
+        <p class="sub" style="margin-bottom:20px;">Capitalflow team portal</p>
+        <div class="fld" style="margin-bottom:12px;"><label>Work email</label><input class="inp" id="lgEmail" value="aoife.byrne@capitalflow.ie"></div>
+        <div class="fld" style="margin-bottom:16px;"><label>Password</label><input class="inp" type="password" value="demo-password"></div>
+        <button class="btn btn-primary btn-block" id="lgBtn">Sign in</button>
+        <p class="small muted" style="margin:22px 0 10px;">Demo — sign in as a colleague. Open a second browser tab as someone else to see the shared workspace.</p>
+        <div class="quick-users">
+          ${DB.team.map(u => `<button data-u="${u.id}">${avatar(u)}<span><b>${esc(u.name)}</b><small>${esc(u.role)} · ${esc(u.title)}</small></span></button>`).join('')}
+        </div>
+      </div></div>
+    </div>`;
+  $('#lgBtn').onclick = () => {
+    const email = $('#lgEmail').value.trim().toLowerCase();
+    const u = DB.team.find(t => t.email.toLowerCase() === email) || DB.team[0];
+    signIn(u.id); location.hash = '#/inspections'; route();
+  };
+  document.querySelectorAll('[data-u]').forEach(b => b.onclick = () => { signIn(b.dataset.u); location.hash = '#/inspections'; route(); });
+}
+
+// =====================================================================
+//  Dashboard
+// =====================================================================
+let DASH = { filter: 'all', scope: 'team', q: '' };
+
+function renderDashboard() {
+  const u = me();
+  const all = Object.values(DB.insp).sort((a, b) => (b.updatedAt || b.completedAt || b.createdAt) - (a.updatedAt || a.completedAt || a.createdAt));
+  const scoped = DASH.scope === 'mine' ? all.filter(r => r.createdBy === u.id || r.reviewer === u.id) : all;
+  const count = k => scoped.filter(r => statusOf(r)[0] === k).length;
+  const flagged = scoped.filter(r => r.status === 'completed' && !r.reviewStatus && (() => { const f = computeFlags(r); return f.red.length + f.amber.length + f.spoof.length; })()).length;
+  const q = DASH.q.toLowerCase();
+  let list = scoped.filter(r => DASH.filter === 'all' || statusOf(r)[0] === DASH.filter);
+  if (q) list = list.filter(r => [r.id, r.proposalRef, r.customer, assetName(r), assetId(r), r.inspector.name].join(' ').toLowerCase().includes(q));
+
+  const kpi = (k, label, n, cls) => `<button class="kpi ${cls} ${DASH.filter === k ? 'on' : ''}" data-f="${k}"><b>${n}</b><span>${label}</span></button>`;
+
+  const rows = list.map(r => {
+    const [k] = statusOf(r);
+    const steps = buildSteps(r).length + 1;
+    const sub = k === 'progress' ? `<div class="progress-mini"><i style="width:${Math.round(((r.step || 0) + 1) / steps * 100)}%"></i></div><span class="t2">Step ${(r.step || 0) + 1} of ${steps}</span>`
+      : k === 'awaiting' ? `<span class="t2">Due ${fmtDate(r.dueAt)}</span>` : '';
+    return `<tr data-id="${r.id}">
+      <td><b>#${r.id}</b><span class="t2">${esc(r.proposalRef)}</span></td>
+      <td>${esc(r.customer)}<span class="t2">${esc(r.inspector.role === 'Customer' ? 'Self-inspection' : r.inspector.role + ': ' + r.inspector.name)}</span></td>
+      <td class="hide-m">${esc(assetName(r))}<span class="t2">${esc(assetId(r))}</span></td>
+      <td>${pill(r)}${sub}</td>
+      <td>${flagChips(r)}</td>
+      <td class="hide-m"><span title="Requested by ${esc(userById(r.createdBy).name)}">${esc(userById(r.createdBy).name)}</span><span class="t2">${fmtAgo(r.updatedAt || r.completedAt || r.createdAt)}</span></td>
+    </tr>`;
+  }).join('');
+
+  const feed = all.flatMap(r => (r.events || []).map(e => ({ ...e, r }))).sort((a, b) => b.t - a.t).slice(0, 9);
+
+  shell(`
+    <div class="pagehead">
+      <div><h1>Asset inspections</h1><p class="sub">Every inspection your team has requested, with live status from the inspector's phone.</p></div>
+      <a href="#/new" class="btn btn-primary">+ New inspection request</a>
+    </div>
+    <div class="kpis">
+      ${kpi('awaiting', 'Awaiting inspector', count('awaiting'), '')}
+      ${kpi('progress', 'In progress now', count('progress'), 'k-amber')}
+      ${kpi('review', `Ready for review${flagged ? ` · ${flagged} flagged` : ''}`, count('review'), 'k-pink')}
+      ${kpi('query', 'Query raised', count('query'), '')}
+      ${kpi('approved', 'Approved', count('approved'), 'k-green')}
+    </div>
+    <div class="dash-grid">
+      <div>
+        <div class="toolbar">
+          <input class="search" id="q" placeholder="Search ref, customer, reg, VIN…" value="${esc(DASH.q)}">
+          <div class="toggle"><button data-s="team" class="${DASH.scope === 'team' ? 'on' : ''}">All team</button><button data-s="mine" class="${DASH.scope === 'mine' ? 'on' : ''}">Mine</button></div>
+          ${DASH.filter !== 'all' ? `<button class="btn btn-outline btn-sm" id="clearF">Clear filter ✕</button>` : ''}
+        </div>
+        <div class="tbl-wrap">
+          ${list.length ? `<table class="tbl"><thead><tr><th>Request</th><th>Customer / inspector</th><th class="hide-m">Asset</th><th>Status</th><th>Flags</th><th class="hide-m">Requested by</th></tr></thead><tbody>${rows}</tbody></table>`
+            : `<div class="empty">No inspections match.</div>`}
+        </div>
+      </div>
+      <div class="card">
+        <h3>Team activity</h3>
+        ${feed.map(e => {
+          const u2 = DB.team.find(t => t.name === e.by);
+          return `<div class="feed-item">${u2 ? avatar(u2) : `<span class="avatar" style="background:#8891a0;">📱</span>`}<div><b>${esc(e.by === 'Inspector' ? e.r.inspector.name + ' (inspector)' : e.by)}</b> · <a href="#/${e.r.status === 'completed' ? 'report' : 'sent'}/${e.r.id}">#${e.r.id}</a><div>${esc(e.text)}</div><div class="ft">${fmtAgo(e.t)}</div></div></div>`;
+        }).join('')}
+      </div>
+    </div>`);
+
+  document.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { DASH.filter = DASH.filter === b.dataset.f ? 'all' : b.dataset.f; renderDashboard(); });
+  document.querySelectorAll('[data-s]').forEach(b => b.onclick = () => { DASH.scope = b.dataset.s; renderDashboard(); });
+  if ($('#clearF')) $('#clearF').onclick = () => { DASH.filter = 'all'; renderDashboard(); };
+  const qi = $('#q');
+  qi.oninput = () => { DASH.q = qi.value; renderDashboard(); const n = $('#q'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); };
+  document.querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = () => {
+    const r = DB.insp[tr.dataset.id];
+    location.hash = (r.status === 'completed' ? '#/report/' : '#/sent/') + r.id;
+  });
+}
+
+// =====================================================================
+//  New inspection request
+// =====================================================================
+let DRAFT = null;
+function freshDraft() {
+  return { proposalRef: '', customer: '', category: 'car', make: '', model: '', reg: '', vin: '', expectedAddress: '',
+    role: 'Customer', iname: '', mobile: '', email: '', sms: true, mail: true, boltOns: [], reviewer: '', due: 5 };
+}
+
+function renderNew() {
+  const u = me();
+  DRAFT = DRAFT || freshDraft();
+  const d = DRAFT;
+  if (!d.reviewer) d.reviewer = (DB.team.find(t => t.role === 'Reviewer') || u).id;
+  const kind = CATS[d.category].kind;
+  const bolts = BOLTONS.filter(b => b.kinds.includes(kind));
+  const f = (key, label, req, attrs = '', hint = '') => `<div class="fld" data-fk="${key}"><label>${label}${req ? ' <span class="req">*</span>' : ''}</label><input class="inp" data-k="${key}" value="${esc(d[key])}" ${attrs}>${hint ? `<div class="hint">${hint}</div>` : ''}</div>`;
+
+  shell(`
+    <div class="pagehead"><div><a href="#/inspections" class="small">← Inspections</a><h1 style="margin-top:6px;">New inspection request</h1>
+      <p class="sub">Capitalflow sends a secure link — the inspector completes it in their phone's browser.</p></div></div>
+    <div class="two" style="grid-template-columns:1.6fr 1fr;">
+      <div>
+        <div class="card form-sec"><h2><span class="n">1</span>Proposal</h2>
+          <div class="form-grid">
+            ${f('proposalRef', 'Proposal number / ref', true, 'placeholder="e.g. CF-PR-24850"')}
+            ${f('customer', 'Customer (borrower / lessee)', true, 'placeholder="Company or person"')}
+          </div>
+        </div>
+        <div class="card form-sec"><h2><span class="n">2</span>Asset</h2>
+          <div class="form-grid">
+            <div class="fld full"><label>Asset type <span class="req">*</span></label>
+              <select class="inp" data-k="category">${Object.entries(CATS).map(([k, c]) => `<option value="${k}" ${d.category === k ? 'selected' : ''}>${c.label}</option>`).join('')}</select></div>
+            ${f('make', 'Make', false, 'placeholder="e.g. BMW"')}
+            ${f('model', 'Model', false, 'placeholder="e.g. 530e"')}
+            ${kind === 'vehicle' ? f('reg', 'Registration on file', false, 'placeholder="e.g. 252-D-10488" style="text-transform:uppercase"') : ''}
+            ${f('vin', kind === 'vehicle' ? 'VIN / chassis on file' : 'Serial / PIN on file', false, 'style="text-transform:uppercase"', 'Optional. If entered, the report flags any mismatch with what the inspector finds.')}
+            <div class="fld full" data-fk="expectedAddress"><label>Where should the asset be? <span class="req">*</span></label>
+              <input class="inp" data-k="expectedAddress" value="${esc(d.expectedAddress)}" placeholder="Address or Eircode">
+              <div class="hint">Pre-filled for the inspector. The report checks where they actually were against the address they confirm.</div></div>
+          </div>
+        </div>
+        <div class="card form-sec"><h2><span class="n">3</span>Who will carry out the inspection?</h2>
+          <div class="fld" style="margin-bottom:14px;"><div class="seg" id="roleSeg">
+            ${Object.keys(INSPECTOR_ROLES).map(r => `<button data-role="${r}" class="${d.role === r ? 'on' : ''}">${r === 'Customer' ? 'Customer (self)' : r === 'Dealer' ? 'Supplying dealer' : 'Introducing broker'}</button>`).join('')}
+          </div></div>
+          <div class="form-grid">
+            ${f('iname', 'Inspector name', true)}
+            ${f('mobile', 'Mobile', false, 'inputmode="tel" placeholder="08x xxx xxxx"')}
+            ${f('email', 'Email', false, 'inputmode="email"')}
+            <div class="fld"><label>Send link by</label>
+              <div class="seg"><button data-ch="sms" class="${d.sms ? 'on' : ''}">SMS</button><button data-ch="mail" class="${d.mail ? 'on' : ''}">Email</button></div></div>
+          </div>
+        </div>
+        <div class="card form-sec"><h2><span class="n">4</span>Bolt-on checks <span class="muted small" style="font-weight:400;">optional</span></h2>
+          <div class="boltons">${bolts.map(b => `<label class="bolt ${d.boltOns.includes(b.key) ? 'on' : ''}"><input type="checkbox" data-bolt="${b.key}" ${d.boltOns.includes(b.key) ? 'checked' : ''}><span><b>${b.name}</b><span>${b.desc}</span></span></label>`).join('')}</div>
+        </div>
+        <div class="card form-sec"><h2><span class="n">5</span>Review & deadline</h2>
+          <div class="form-grid">
+            <div class="fld"><label>Reviewer</label><select class="inp" data-k="reviewer">${DB.team.filter(t => t.role !== 'Requester' || t.id === u.id).map(t => `<option value="${t.id}" ${d.reviewer === t.id ? 'selected' : ''}>${esc(t.name)} — ${t.role}</option>`).join('')}</select>
+              <div class="hint">Gets notified when the report is ready.</div></div>
+            <div class="fld"><label>Link expires after</label><select class="inp" data-k="due">${[3, 5, 7, 14].map(n => `<option value="${n}" ${+d.due === n ? 'selected' : ''}>${n} days</option>`).join('')}</select></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+          <button class="btn btn-outline" id="cancelNew">Cancel</button>
+          <button class="btn btn-primary" id="sendNew">Create &amp; send link →</button>
+        </div>
+      </div>
+      <div class="side-note">
+        <b>How it works</b>
+        <ol>
+          <li>The inspector gets an SMS / email with a secure link — no app and no login.</li>
+          <li>They're guided step by step: location, asset details, VIN, odometer, five condition photos, documents and storage.</li>
+          <li>Photos must be taken live; each one is stamped with time and GPS.</li>
+          <li>You see their progress live, then get a report with red / amber flags, a location check and spoof alerts.</li>
+        </ol>
+        <p class="small muted" style="margin-bottom:0;">Requested by <b>${esc(u.name)}</b>. Everyone on the team can see this request.</p>
+      </div>
+    </div>`);
+
+  document.querySelectorAll('[data-k]').forEach(el => {
+    el.oninput = el.onchange = () => {
+      d[el.dataset.k] = el.value;
+      el.classList.remove('err');
+      if (el.dataset.k === 'category') { d.boltOns = []; renderNew(); }
+    };
+  });
+  document.querySelectorAll('[data-role]').forEach(b => b.onclick = () => {
+    d.role = b.dataset.role;
+    if (d.role === 'Customer' && !d.iname) d.iname = d.customer;
+    renderNew();
+  });
+  document.querySelectorAll('[data-ch]').forEach(b => b.onclick = () => { d[b.dataset.ch] = !d[b.dataset.ch]; renderNew(); });
+  document.querySelectorAll('[data-bolt]').forEach(c => c.onchange = () => {
+    d.boltOns = c.checked ? [...d.boltOns, c.dataset.bolt] : d.boltOns.filter(k => k !== c.dataset.bolt);
+    c.closest('.bolt').classList.toggle('on', c.checked);
+  });
+  $('#cancelNew').onclick = () => { DRAFT = null; location.hash = '#/inspections'; };
+  $('#sendNew').onclick = createRequest;
+}
+
+async function geocode(q) {
+  try {
+    const ctl = new AbortController(); setTimeout(() => ctl.abort(), 3500);
+    const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ie,gb&q=' + encodeURIComponent(q), { signal: ctl.signal });
+    const j = await r.json();
+    if (j[0]) return { lat: +j[0].lat, lon: +j[0].lon };
+  } catch (e) {}
+  return null;
+}
+
+async function createRequest() {
+  const d = DRAFT, u = me();
+  const missing = ['proposalRef', 'customer', 'expectedAddress', 'iname'].filter(k => !String(d[k]).trim());
+  if (!d.mobile.trim() && !d.email.trim()) missing.push('mobile', 'email');
+  document.querySelectorAll('.inp').forEach(i => i.classList.remove('err'));
+  missing.forEach(k => { const el = document.querySelector(`[data-k="${k}"]`); if (el) el.classList.add('err'); });
+  if (missing.length) {
+    toast('Please fill in the highlighted fields' + (missing.includes('mobile') ? ' — the inspector needs a mobile or email' : ''));
+    const first = document.querySelector('.inp.err'); if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  const btn = $('#sendNew'); btn.disabled = true; btn.textContent = 'Sending…';
+  const coords = await geocode(d.expectedAddress) || { lat: 53.3498, lon: -6.2603 };
+  const ids = Object.keys(DB.insp).map(Number);
+  const id = String(Math.max(14307, ...ids) + 1);
+  const via = [d.sms && d.mobile && 'SMS', d.mail && d.email && 'email'].filter(Boolean).join(' and ') || 'link';
+  const rec = {
+    id, token: rnd(8), proposalRef: d.proposalRef.trim(), customer: d.customer.trim(), category: d.category,
+    asset: { make: d.make.trim(), model: d.model.trim(), reg: d.reg.trim().toUpperCase(), vin: d.vin.trim().toUpperCase() },
+    expectedAddress: d.expectedAddress.trim(), expectedCoords: coords,
+    inspector: { role: d.role, name: d.iname.trim(), mobile: d.mobile.trim(), email: d.email.trim() },
+    boltOns: d.boltOns, createdBy: u.id, reviewer: d.reviewer, createdAt: Date.now(), dueAt: Date.now() + d.due * 86400000,
+    status: 'sent', answers: {}, photos: {}, comments: [], ips: [],
+    events: [{ t: Date.now(), by: u.name, text: `Inspection requested — link sent by ${via} to ${d.iname.trim()}${d.role !== 'Customer' ? ` (${d.role.toLowerCase()})` : ''}` }],
+  };
+  await saveRec(rec);
+  DRAFT = null;
+  location.hash = '#/sent/' + id;
+}
+
+// =====================================================================
+//  Request tracking page (before the report exists)
+// =====================================================================
+function renderSent(id) {
+  const r = DB.insp[id];
+  if (!r) { location.hash = '#/inspections'; return; }
+  if (r.status === 'completed') { location.hash = '#/report/' + id; return; }
+  const link = linkFor(r);
+  const steps = buildSteps(r);
+  const opened = r.status !== 'sent', started = ['in_progress', 'completed'].includes(r.status);
+  const firstName = r.inspector.name.split(' ')[0];
+  const ev = t => (r.events || []).find(e => e.text.startsWith(t));
+
+  shell(`
+    <div class="pagehead"><div><a href="#/inspections" class="small">← Inspections</a>
+      <h1 style="margin-top:6px;">Inspection #${r.id} <span style="vertical-align:middle;">${pill(r)}</span></h1>
+      <p class="sub">${esc(r.proposalRef)} · ${esc(r.customer)} · ${esc(assetName(r))} ${esc(assetId(r))}</p></div>
+      ${r.status !== 'cancelled' ? `<div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" id="remind">Send reminder</button><button class="btn btn-danger-o btn-sm" id="cancelReq">Cancel request</button></div>` : ''}
+    </div>
+    <div class="two">
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <h3>Inspection link</h3>
+          <div class="linkbox"><span id="lnk">${esc(link)}</span><button class="btn btn-outline btn-sm" id="copy">Copy</button></div>
+          <div style="display:flex;gap:18px;align-items:center;margin-top:16px;flex-wrap:wrap;">
+            <div class="qr" id="qr"></div>
+            <div style="flex:1;min-width:200px;">
+              <b>Try it as the inspector</b>
+              <p class="small muted" style="margin:4px 0 12px;">Scan the code with your phone, or open the link in a new tab. Progress shows here live as each step is completed.</p>
+              <a class="btn btn-navy btn-sm" href="${esc(link)}" target="_blank" rel="noopener">Open inspector link ↗</a>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>What ${esc(firstName)} received</h3>
+          <div class="sms-from">SMS from Capitalflow${r.inspector.mobile ? ' to ' + esc(r.inspector.mobile) : ''}</div>
+          <div class="sms">Hi ${esc(firstName)}, Capitalflow needs a quick inspection of the ${esc(assetName(r) || 'asset')}${r.asset.reg ? ' (' + esc(r.asset.reg) + ')' : ''} for ${esc(r.customer)}, ref ${esc(r.proposalRef)}. It takes about 10 minutes on your phone, with no app needed: <span style="color:#1a5aa3;text-decoration:underline;">${esc(link.replace(/^https?:\/\//, ''))}</span></div>
+          <p class="small muted" style="margin:12px 0 0;">Demo: no SMS or email is actually sent. Use the link or QR code above.</p>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <h3>Progress</h3>
+          <ul class="timeline">
+            <li class="done"><i></i>Request created<small>${fmtLong(r.createdAt)} by ${esc(userById(r.createdBy).name)}</small></li>
+            <li class="${opened ? 'done' : 'now'}"><i></i>${opened ? 'Link opened' : 'Waiting for the inspector to open the link'}<small>${opened && ev('Link opened') ? fmtLong(ev('Link opened').t) : 'Expires ' + fmtDate(r.dueAt)}</small></li>
+            <li class="${started ? (r.status === 'completed' ? 'done' : 'now') : ''}"><i></i>${started ? `Inspecting: step ${(r.step || 0) + 1} of ${steps.length + 1}, ${esc((steps[r.step || 0] || { title: 'Review' }).title)}` : 'Inspection'}<small>${started && r.startedAt ? 'Started ' + fmtAgo(r.startedAt) : ''}${r.gps ? ` · 📍 ${r.gps.lat.toFixed(4)}, ${r.gps.lon.toFixed(4)}` : ''}${started ? ` · ${Object.keys(r.photos || {}).length} photos so far` : ''}</small></li>
+            <li><i></i>Report ready for ${esc(userById(r.reviewer).name)}</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Request details</h3>
+          <dl class="kv">
+            <dt>Inspection type</dt><dd>${INSPECTOR_ROLES[r.inspector.role]}</dd>
+            <dt>Inspector</dt><dd>${esc(r.inspector.name)}<br><span class="muted small">${esc([r.inspector.mobile, r.inspector.email].filter(Boolean).join(' · '))}</span></dd>
+            <dt>Asset type</dt><dd>${CATS[r.category].label}</dd>
+            <dt>Expected at</dt><dd>${esc(r.expectedAddress)}</dd>
+            <dt>Bolt-ons</dt><dd>${(r.boltOns || []).length ? r.boltOns.map(k => BOLTONS.find(b => b.key === k).name).join(', ') : 'None'}</dd>
+            <dt>Reviewer</dt><dd>${esc(userById(r.reviewer).name)}</dd>
+          </dl>
+        </div>
+      </div>
+    </div>`);
+
+  if (window.QRCode) new QRCode($('#qr'), { text: link, width: 132, height: 132, correctLevel: QRCode.CorrectLevel.M });
+  $('#copy').onclick = () => { navigator.clipboard && navigator.clipboard.writeText(link); toast('Link copied'); };
+  if ($('#remind')) $('#remind').onclick = async () => {
+    await mutate(r.id, x => x.events.push({ t: Date.now(), by: me().name, text: `Sent a reminder to ${x.inspector.name}` }));
+    toast(`Reminder sent to <b>${esc(r.inspector.name)}</b>`); route();
+  };
+  if ($('#cancelReq')) $('#cancelReq').onclick = async () => {
+    if (!confirm('Cancel this request? The link will stop working.')) return;
+    await mutate(r.id, x => { x.status = 'cancelled'; x.events.push({ t: Date.now(), by: me().name, text: 'Cancelled the request' }); });
+    route();
+  };
+}
+
+// =====================================================================
+//  Report (the veri.fi-style inspection report)
+// =====================================================================
+function renderReport(id) {
+  const r = DB.insp[id];
+  if (!r) { location.hash = '#/inspections'; return; }
+  if (r.status !== 'completed') { location.hash = '#/sent/' + id; return; }
+  const u = me();
+  const F = computeFlags(r);
+  const imp = impact(r);
+  const site = siteCoords(r);
+  const steps = buildSteps(r);
+  const a = r.answers;
+  const flagColor = F.red.length ? '#d6303a' : F.amber.length ? '#e9a21b' : '#3aa635';
+  const pinColor = F.loc.mismatch ? '#d6303a' : '#3aa635';
+  const hero = r.photos.photo_front ? photoSrc(r, r.photos.photo_front) : '';
+  const driveKm = F.loc.km != null ? F.loc.km * 1.2 : null;
+  const canReview = u.role !== 'Requester';
+  const decisionCls = r.reviewStatus === 'approved' ? 'd-ok' : r.reviewStatus === 'query' ? 'd-q' : 'd-none';
+
+  const photoCard = (k) => {
+    const p = r.photos[k]; if (!p) return '<div class="muted small" style="margin-top:6px;">No photo</div>';
+    return `<div class="ph-card" data-zoom="${k}"><img src="${photoSrc(r, p)}" alt=""><div class="st">${ICON.pinO}${fmtStamp(p.t)}</div>${p.live === false ? '<div class="spoof">⚠ Not taken live</div>' : ''}</div>`;
+  };
+  const ansCls = (f, v) => {
+    if (f.check === 'vin' && r.asset.vin && norm(v) !== norm(r.asset.vin)) return 'bad';
+    if (f.check === 'reg' && r.asset.reg && norm(v) !== norm(r.asset.reg)) return 'warn';
+    if (v === 'Poor' || v === 'Damaged') return 'warn';
+    if (f.key === 'vinTamper' && v === 'Yes') return 'bad';
+    return '';
+  };
+  const matchTag = f => {
+    const onFile = f.check === 'vin' ? r.asset.vin : f.check === 'reg' ? r.asset.reg : '';
+    if (!onFile) return '';
+    return norm(a[f.key]) === norm(onFile) ? '<span class="match" style="color:#2a7a26;">✓ matches record</span>' : `<span class="match">✕ on file: ${esc(onFile)}</span>`;
+  };
+  const sections = steps.filter(s => s.key !== 'site').map(s => {
+    const rows = s.fields.filter(f => visible(f, a)).map(f => {
+      if (f.type === 'photo') return `<div class="ph">${esc(f.label)}<br>${photoCard(f.key)}</div>`;
+      const v = a[f.key] || '—';
+      const note = f.note ? f.note(a) : '';
+      return `<div class="qa"><span>${esc(f.label)}</span><span class="ans ${ansCls(f, v)}">${esc(f.type === 'date' && v !== '—' ? fmtDate(v) : v)}${matchTag(f)}</span></div>${note ? `<div class="qa-note">${esc(note)}</div>` : ''}`;
+    }).join('');
+    return `<div class="sec"><div class="sec-t">${esc(s.title)}</div><div class="sec-rows">${rows}</div></div>`;
+  }).join('');
+
+  const notChosen = BOLTONS.filter(b => b.kinds.includes(CATS[r.category].kind) && !(r.boltOns || []).includes(b.key));
+  const flagList = (arr, empty) => arr.length ? arr.map(x => `<div>${esc(x)}</div>`).join('') : `<div class="muted">${empty}</div>`;
+
+  shell(`
+  <div class="rep">
+    <div class="rep-actions">
+      <a href="#/inspections" class="btn btn-outline btn-sm">← Inspections</a>
+      <span class="sp"></span>
+      <button class="btn btn-outline btn-sm" id="copyRep">Copy report link</button>
+      <button class="btn btn-navy btn-sm" id="pdf">Download PDF</button>
+    </div>
+
+    <div class="hero">
+      ${hero ? `<div class="hero-bg" style="background-image:url('${hero}')"></div>` : ''}
+      <div class="hero-in">
+        <div class="hero-brand">Asset Inspection Report</div>
+        ${imp ? `<div class="impact-box"><div class="impact-ico">${ICON.leafbox}</div><div><b>Positive Impact:</b><ul>
+          <li><span class="leaf"></span>≡ ${imp.trees.toFixed(1)} trees' annual CO₂ uptake</li>
+          <li><span class="leaf"></span>~${Math.round(imp.co2)} kg CO₂ saved</li>
+          <li><span class="leaf"></span>${imp.hours.toFixed(1)} work hours saved</li></ul></div></div>` : ''}
+        <div class="client-logo"><img src="${LOGO}" alt="Capitalflow"></div>
+      </div>
+    </div>
+
+    <div class="rblock">
+      <div class="headcard-top">
+        <div class="itype">${INSPECTOR_ROLES[r.inspector.role]}<small>Remote inspection via secure link · no app</small></div>
+        <div class="qstatus">Quick Status: <span title="${F.red.length ? 'Red flags' : F.amber.length ? 'Amber flags' : 'No flags'}">${ICON.flag(flagColor)}</span><span title="${F.loc.mismatch ? 'Location mismatch' : 'Location OK'}">${ICON.pin(pinColor)}</span></div>
+      </div>
+      <div style="display:flex;gap:40px;margin-bottom:14px;font-size:13px;flex-wrap:wrap;">
+        <div><span class="muted small">Proposal Number/Ref:</span><br><b>${esc(r.proposalRef)}</b></div>
+        <div><span class="muted small">Customer:</span><br><b>${esc(r.customer)}</b></div>
+        <div><span class="muted small">Decision:</span><br>${pill(r)}</div>
+      </div>
+      <div class="hgrid">
+        <div><span>Client:</span><b>${CLIENT}</b></div>
+        <div><span>Asset Type:</span><b>${CATS[r.category].label}</b></div>
+        <div><span>Inspector:</span><b>${esc(r.inspector.name)}</b></div>
+        <div><span>Service Request:</span><b>#${r.id}</b></div>
+        <div><span>Inspection Date/Time:</span><b>${fmtLong(r.completedAt)}</b></div>
+        <div><span>Requested by:</span><b>${esc(userById(r.createdBy).name)}</b></div>
+        <div class="full"><span>Inspection Site Address:</span><b>${esc(a.siteAddress || r.expectedAddress)}</b></div>
+        <div><span>Inspection Performed At:</span><b>${r.gps ? `${r.gps.lat.toFixed(6)}, ${r.gps.lon.toFixed(6)}${r.gps.acc ? ` (±${Math.round(r.gps.acc)} m)` : ''}` : 'Location not shared'}</b></div>
+        <div><span>IP Addresses Used:</span><b>${(r.ips || []).length ? r.ips.map(esc).join(', ') : '—'}</b></div>
+        <div class="full"><span>Asset:</span><b>${esc(a.reg || a.vin || '')} — ${esc(assetName(r))} (${CATS[r.category].label})</b></div>
+      </div>
+    </div>
+
+    <div class="rblock disclaimer">This inspection has been performed by the finance customer, the supplying dealer, or the introducing broker by physically attending the inspection site and carrying out the inspection through a secure Capitalflow link. The information collected (responses and photography) depends on the inspector's full and accurate supply of the information available to them at the point of inspection. This report confirms the location of the asset at the time of inspection, that it is in the possession and/or under the control of the customer (borrower or lessee), its current physical condition as evidenced by live, time- and GPS-stamped photographs, the odometer / hour meter reading, and the presence of the asset's VIN / serial / chassis number as affixed to the asset. Depending on the bolt-on checks requested, it may also include proof of purchase, Vehicle Registration Certificate, insurance, service records, tracker / immobiliser evidence and storage and security measures.</div>
+
+    <div class="page-break"></div>
+    ${F.loc.mismatch || !r.gps ? `
+    <div class="alert-box ${F.loc.km != null && F.loc.km <= 50 ? '' : ''}">
+      ${r.gps ? `
+      <div class="ar">${ICON.warn}<span>The location provided by the person doing the inspection does not match the location where the inspection was actually performed. Address provided was (${esc(a.siteAddress)}).</span></div>
+      <div class="ar">${ICON.pin('#d6303a')}<span>Inspection was performed at <b>location</b> (${F.loc.km.toFixed(2)} km away (*straight-line distance) from the address input by the inspector).</span></div>`
+      : `<div class="ar">${ICON.warn}<span>The inspector's device did not share its location, so where the inspection was performed can't be confirmed.</span></div>`}
+      <div class="ar">${ICON.chev}<span>Further enquiries should be made.</span></div>
+    </div>` : ''}
+
+    <div class="refbar">Proposal Number/Ref: ${esc(r.proposalRef)}</div>
+    <div class="flagmap">
+      <div class="flagcol">
+        <div class="flagcard" data-fl="red">${ICON.flag('#d6303a')} Red Flags: ${F.red.length}</div>
+        <div class="flagcard" data-fl="amber">${ICON.flag('#e9a21b')} Amber Flags: ${F.amber.length}</div>
+        <div class="flagcard" data-fl="spoof">${ICON.spoof('#d6303a')} Spoof Alerts: ${F.spoof.length}</div>
+        <div class="flaglist" id="flagDetail">${flagList([...F.red, ...F.amber, ...F.spoof], 'No flags raised on this inspection.')}</div>
+      </div>
+      <div class="mapwrap">
+        <div id="map"></div>
+        ${r.gps && site ? `<div class="maplegend"><div class="ea"><span class="mk mk-e">E</span><span class="mk-line"></span><span class="mk mk-a">A</span></div>
+          <b>Expected Location → Actual Inspection Location</b><br>${F.loc.km.toFixed(2)} km apart<br><span class="muted">Driving: ≈ ${driveKm.toFixed(1)} km / ${Math.max(1, Math.round(driveKm / 0.75))} mins</span></div>` : ''}
+      </div>
+    </div>
+
+    ${imp ? `<div class="rblock">
+      <div style="display:flex;align-items:center;gap:9px;font-weight:600;margin-bottom:12px;">${ICON.leafbox} Positive Impact</div>
+      <div class="impact2">
+        <div class="col hl"><h4>This remote inspection</h4><ul>
+          <li><span class="leaf"></span>Saved ${Math.round(imp.km)} km of driving</li>
+          <li><span class="leaf"></span>Saved ${imp.co2.toFixed(1)} kg CO₂</li>
+          <li><span class="leaf"></span>≡ ${imp.trees.toFixed(1)} trees' annual CO₂ uptake</li>
+          <li><span class="leaf"></span>Generated €${imp.credit.toFixed(2)} of carbon-credit savings</li>
+          <li><span class="leaf"></span>Savings achieved €${imp.saving.toFixed(2)}</li></ul></div>
+        <div class="col"><h4>vs a traditional site visit</h4><ul>
+          <li><span class="leaf"></span>${imp.hours.toFixed(1)} hours of staff time</li>
+          <li><span class="leaf"></span>Est. fuel cost of €${imp.fuel.toFixed(2)} (31c per km)</li>
+          <li><span class="leaf"></span>€${imp.expenses} of general expenses</li>
+          <li><span class="leaf"></span>Opportunity cost of time away from the desk</li>
+          <li><span class="leaf"></span>Up to 5 business days to book and complete</li></ul></div>
+      </div>
+      <div class="footnotes">* Based on 171 g CO₂ per km for a typical diesel car.<br>** Assumes a mature tree absorbs approximately 22 kg CO₂ per year.<br>*** Assumes a carbon price of €70 / t CO₂e.<br>**** Based on the round-trip distance from ${HQ.label} to where the inspection was performed, as if Capitalflow's own staff had carried out a site visit.</div>
+    </div>` : ''}
+
+    <div class="page-break"></div>
+    <div class="refbar">Inspection Report</div>
+    ${sections}
+
+    ${notChosen.length ? `<div class="rblock"><h3 style="color:var(--text);">Further bolt-ons available for ${CATS[r.category].label} inspections</h3>
+      <p class="small muted" style="margin-top:-4px;">(These were not selected for this inspection)</p>
+      <ul class="bolt-list" style="padding-left:18px;">${notChosen.map(b => `<li><b>${b.name}</b>${b.desc}</li>`).join('')}</ul></div>` : ''}
+
+    <div class="review-panel" id="review">
+      <h3>Review</h3>
+      <div class="decision ${decisionCls}">
+        ${r.reviewStatus === 'approved' ? `✓ <span><b>Approved</b> by ${esc(userById(r.reviewedBy).name)} · ${fmtLong(r.reviewedAt)}</span>`
+          : r.reviewStatus === 'query' ? `🚩 <span><b>Query raised</b> by ${esc(userById(r.reviewedBy).name)} · ${fmtLong(r.reviewedAt)}<br>${esc(r.queryReason || '')}</span>`
+          : `⏳ <span>Awaiting review by <b>${esc(userById(r.reviewer).name)}</b></span>`}
+      </div>
+      <div class="no-print" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;">
+        ${canReview ? `
+          ${r.reviewStatus !== 'approved' ? `<button class="btn btn-green btn-sm" id="approve">✓ Approve</button>` : ''}
+          ${r.reviewStatus !== 'query' ? `<button class="btn btn-danger-o btn-sm" id="query">🚩 Raise a query</button>` : ''}
+          <button class="btn btn-outline btn-sm" id="reinspect">↻ Request re-inspection</button>`
+          : `<span class="small muted">You're signed in as a Requester, so you can comment but a Reviewer or Admin makes the decision.</span>`}
+      </div>
+      <div id="queryBox"></div>
+      <h3 style="margin-top:6px;">Team comments</h3>
+      ${(r.comments || []).map(c => { const cu = userById(c.by); return `<div class="comment">${avatar(cu)}<div class="cb"><b>${esc(cu.name)}</b> <small>${esc(cu.role)} · ${fmtAgo(c.t)}</small><div>${esc(c.text)}</div></div></div>`; }).join('') || '<p class="small muted">No comments yet.</p>'}
+      <div class="no-print" style="display:flex;gap:8px;margin-top:8px;">
+        <input class="inp" id="cmt" placeholder="Add a comment for the team… (e.g. @Conor can you check the VIN?)">
+        <button class="btn btn-navy btn-sm" id="cmtBtn">Post</button>
+      </div>
+    </div>
+
+    <div class="rblock">
+      <h3 style="color:var(--text);">Audit trail</h3>
+      <ul class="audit" style="padding-left:18px;margin:0;">${(r.events || []).slice().sort((x, y) => x.t - y.t).map(e => `<li><b>${fmtStamp(e.t)}</b> — ${esc(e.by === 'Inspector' ? r.inspector.name + ' (inspector)' : e.by)}: ${esc(e.text)}</li>`).join('')}</ul>
+    </div>
+  </div>`);
+
+  // map
+  if (r.gps && window.L) {
+    const m = L.map('map', { zoomControl: true, scrollWheelZoom: false, attributionControl: true });
+    VIEW.mapObj = m;
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(m);
+    const icon = (cls, t) => L.divIcon({ className: '', html: `<div class="mk ${cls}">${t}</div>`, iconSize: [24, 24], iconAnchor: [12, 12] });
+    const A = [r.gps.lat, r.gps.lon];
+    L.marker(A, { icon: icon('mk-a', 'A') }).addTo(m).bindTooltip('Actual inspection location');
+    if (site && F.loc.km > 0.05) {
+      const E = [site.lat, site.lon];
+      L.marker(E, { icon: icon('mk-e', 'E') }).addTo(m).bindTooltip('Expected location (address entered)');
+      L.polyline([E, A], { color: '#7a8796', weight: 3, dashArray: '6 6' }).addTo(m);
+      m.fitBounds([E, A], { paddingTopLeft: [40, 40], paddingBottomRight: [40, 130] });
+    } else { m.setView(A, 15); L.circle(A, { radius: r.gps.acc || 20, color: '#3aa635' }).addTo(m); }
+  } else if (!r.gps) {
+    $('#map').innerHTML = '<div class="empty">No location was shared by the inspector\'s device.</div>';
+  }
+
+  document.querySelectorAll('[data-fl]').forEach(c => c.onclick = () => {
+    const k = c.dataset.fl;
+    $('#flagDetail').innerHTML = flagList(F[k], `No ${k === 'spoof' ? 'spoof alerts' : k + ' flags'}.`);
+  });
+  document.querySelectorAll('[data-zoom]').forEach(c => c.onclick = () => {
+    const lb = document.createElement('div'); lb.className = 'lightbox';
+    lb.innerHTML = `<img src="${photoSrc(r, r.photos[c.dataset.zoom])}">`; lb.onclick = () => lb.remove();
+    document.body.appendChild(lb);
+  });
+  $('#pdf').onclick = () => window.print();
+  $('#copyRep').onclick = () => { navigator.clipboard && navigator.clipboard.writeText(location.href); toast('Report link copied — colleagues sign in to view it'); };
+  const post = async () => {
+    const text = $('#cmt').value.trim(); if (!text) return;
+    await mutate(r.id, x => { x.comments = x.comments || []; x.comments.push({ by: u.id, t: Date.now(), text }); x.events.push({ t: Date.now(), by: u.name, text: 'Added a comment' }); });
+    route(); setTimeout(() => $('#review').scrollIntoView({ block: 'center' }), 50);
+  };
+  $('#cmtBtn').onclick = post;
+  $('#cmt').onkeydown = e => { if (e.key === 'Enter') post(); };
+  if ($('#approve')) $('#approve').onclick = async () => {
+    await mutate(r.id, x => { x.reviewStatus = 'approved'; x.reviewedBy = u.id; x.reviewedAt = Date.now(); x.events.push({ t: Date.now(), by: u.name, text: 'Approved the inspection' }); });
+    toast('Inspection approved'); route();
+  };
+  if ($('#query')) $('#query').onclick = () => {
+    $('#queryBox').innerHTML = `<div class="fld" style="margin-bottom:16px;"><label>What needs following up?</label><textarea class="inp" id="qReason" rows="3" placeholder="e.g. Location doesn't match the business address — please confirm with the customer"></textarea>
+      <div style="margin-top:8px;display:flex;gap:8px;"><button class="btn btn-primary btn-sm" id="qSend">Raise query</button><button class="btn btn-outline btn-sm" id="qCancel">Cancel</button></div></div>`;
+    $('#qReason').focus();
+    $('#qCancel').onclick = () => { $('#queryBox').innerHTML = ''; };
+    $('#qSend').onclick = async () => {
+      const reason = $('#qReason').value.trim() || 'Needs follow-up';
+      await mutate(r.id, x => { x.reviewStatus = 'query'; x.queryReason = reason; x.reviewedBy = u.id; x.reviewedAt = Date.now(); x.comments = x.comments || []; x.comments.push({ by: u.id, t: Date.now(), text: reason }); x.events.push({ t: Date.now(), by: u.name, text: 'Raised a query' }); });
+      route();
+    };
+  };
+  if ($('#reinspect')) $('#reinspect').onclick = async () => {
+    if (!confirm(`Send ${r.inspector.name} a new link to redo this inspection? The current answers are kept in the audit trail.`)) return;
+    await mutate(r.id, x => {
+      x.history = x.history || []; x.history.push({ answers: x.answers, completedAt: x.completedAt, gps: x.gps });
+      Object.assign(x, { status: 'sent', token: rnd(8), answers: {}, photos: {}, gps: null, siteCoords: null, step: 0, startedAt: null, completedAt: null, reviewStatus: null, dueAt: Date.now() + 5 * 86400000 });
+      x.events.push({ t: Date.now(), by: u.name, text: `Requested a re-inspection — new link sent to ${x.inspector.name}` });
+    });
+    location.hash = '#/sent/' + r.id;
+  };
+}
+
+// =====================================================================
+//  Team (multi-user)
+// =====================================================================
+function renderTeam() {
+  const u = me();
+  const isAdmin = u.role === 'Admin';
+  const recs = Object.values(DB.insp);
+  shell(`
+    <div class="pagehead"><div><h1>Team</h1><p class="sub">Everyone here works from the same list of inspections. Each person has their own login and role.</p></div></div>
+    <div class="two" style="grid-template-columns:1.6fr 1fr;">
+      <div class="tbl-wrap">
+        <table class="tbl"><thead><tr><th>Name</th><th>Role</th><th class="hide-m">Requested</th><th class="hide-m">Last active</th>${isAdmin ? '<th></th>' : ''}</tr></thead><tbody>
+          ${DB.team.map(t => `<tr style="cursor:default;">
+            <td><div style="display:flex;gap:10px;align-items:center;">${avatar(t)}<div><b>${esc(t.name)}</b>${t.id === u.id ? ' <span class="muted small">(you)</span>' : ''}<span class="t2">${esc(t.email)} · ${esc(t.title)}</span></div></div></td>
+            <td>${isAdmin && t.id !== u.id ? `<select class="inp" data-role-of="${t.id}" style="padding:6px 8px;width:auto;">${Object.keys(ROLES).map(r => `<option ${t.role === r ? 'selected' : ''}>${r}</option>`).join('')}</select>` : esc(t.role)}</td>
+            <td class="hide-m">${recs.filter(r => r.createdBy === t.id).length}</td>
+            <td class="hide-m">${t.lastActive ? fmtAgo(t.lastActive) : 'Invited'}</td>
+            ${isAdmin ? `<td>${t.id !== u.id ? `<button class="linkbtn" data-rm="${t.id}">Remove</button>` : ''}</td>` : ''}
+          </tr>`).join('')}
+        </tbody></table>
+      </div>
+      <div class="card">
+        <h3>Invite a colleague</h3>
+        ${isAdmin ? `
+          <div class="fld" style="margin-bottom:10px;"><label>Name</label><input class="inp" id="nvName"></div>
+          <div class="fld" style="margin-bottom:10px;"><label>Email</label><input class="inp" id="nvEmail" placeholder="name@capitalflow.ie"></div>
+          <div class="fld" style="margin-bottom:10px;"><label>Job title</label><input class="inp" id="nvTitle" placeholder="e.g. Credit Analyst"></div>
+          <div class="fld" style="margin-bottom:14px;"><label>Role</label><select class="inp" id="nvRole">${Object.keys(ROLES).map(r => `<option ${r === 'Reviewer' ? 'selected' : ''}>${r}</option>`).join('')}</select></div>
+          <button class="btn btn-primary btn-block" id="nvBtn">Send invite</button>
+          <p class="small muted" style="margin:10px 0 0;">They get an email to set a password. Brokers and partners can be added as Requesters.</p>`
+          : `<p class="small muted">Only Admins can invite colleagues. Switch to <b>Aoife Byrne</b> from the user menu to try it.</p>`}
+      </div>
+    </div>
+    <div class="roles">${Object.entries(ROLES).map(([k, v]) => `<div class="role-card"><b>${k}</b>${v}</div>`).join('')}</div>`);
+
+  if (!isAdmin) return;
+  document.querySelectorAll('[data-role-of]').forEach(s => s.onchange = async () => {
+    userById(s.dataset.roleOf).role = s.value; await saveTeam(); toast('Role updated');
+  });
+  document.querySelectorAll('[data-rm]').forEach(b => b.onclick = async () => {
+    const t = userById(b.dataset.rm);
+    if (!confirm(`Remove ${t.name}? Their inspections stay on the list.`)) return;
+    DB.team = DB.team.filter(x => x.id !== t.id); await saveTeam(); renderTeam();
+  });
+  $('#nvBtn').onclick = async () => {
+    const name = $('#nvName').value.trim(), email = $('#nvEmail').value.trim();
+    if (!name || !email) { toast('Add a name and email'); return; }
+    DB.team.push({ id: 'u' + rnd(5), name, email, title: $('#nvTitle').value.trim() || 'Team member', role: $('#nvRole').value, lastActive: null });
+    await saveTeam(); toast(`Invite sent to <b>${esc(email)}</b>`); renderTeam();
+  };
+}
+
+// =====================================================================
+//  Inspector link flow — runs in any phone browser, no app or login
+// =====================================================================
+const Inspector = {
+  active: false, rec: null, step: -1, errors: [], gpsState: 'wait', watch: null, startedAt: null,
+
+  async open(token) {
+    this.active = true;
+    const rec = Object.values(DB.insp).find(r => r.token === token);
+    if (!rec) return this.shell(`<h1>Link not found</h1><p class="sub">This inspection link is invalid or has been replaced by a newer one. Please use the latest link Capitalflow sent you.</p>`, null);
+    this.rec = JSON.parse(JSON.stringify(rec));
+    this.steps = buildSteps(this.rec);
+    if (rec.status === 'cancelled') return this.shell(`<h1>Request cancelled</h1><p class="sub">Capitalflow has cancelled this inspection request. No further action is needed.</p>`, null);
+    if (rec.status === 'completed') return this.renderDone(true);
+    if (rec.status === 'sent') {
+      await mutate(rec.id, x => { x.status = 'opened'; x.events.push({ t: Date.now(), by: 'Inspector', text: 'Link opened' }); }, true);
+      this.rec.status = 'opened';
+    }
+    // pick up where they left off
+    if (rec.status === 'in_progress') { this.step = rec.step || 0; this.startGps(); this.startedAt = rec.startedAt; return this.renderStep(); }
+    this.renderWelcome();
+  },
+
+  shell(body, foot, progress) {
+    const total = this.steps ? this.steps.length + 1 : 1;
+    const title = this.step >= 0 && this.steps ? (this.steps[this.step] || { title: 'Review & submit' }).title : 'Asset inspection';
+    $('#app').innerHTML = `
+      <div class="ins">
+        <div class="ins-top">
+          <div class="row"><span class="logo-pill"><img src="${LOGO}" alt="Capitalflow"></span>
+            ${progress ? `<span class="stepname">Step ${this.step + 1} of ${total}</span>` : `<span class="stepname">Secure inspection link</span>`}</div>
+          ${progress ? `<div class="pbar"><i style="width:${Math.round((this.step + 1) / total * 100)}%"></i></div><div class="stepname" style="margin-top:6px;color:#fff;font-weight:600;">${esc(title)}</div>` : ''}
+        </div>
+        <div class="ins-body">${body}</div>
+        ${foot ? `<div class="ins-foot">${foot}</div>` : ''}
+      </div>`;
+    window.scrollTo(0, 0);
+  },
+
+  renderWelcome() {
+    const r = this.rec, cat = CATS[r.category];
+    const bolts = BOLTONS.filter(b => (r.boltOns || []).includes(b.key) && b.kinds.includes(cat.kind));
+    this.step = -1;
+    this.shell(`
+      <p class="small muted" style="margin:0 0 4px;">Hi ${esc(r.inspector.name.split(' ')[0])},</p>
+      <h1>Capitalflow asset inspection</h1>
+      <p class="sub" style="font-size:14px;">${esc(CLIENT)} has asked you to inspect this asset. It takes about 10 minutes, all from this page. There's no app to install and no login.</p>
+      <div class="asset-card">
+        <b>${esc(assetName(r) || cat.label)}</b>
+        <div class="small muted" style="margin-top:3px;">${esc([r.asset.reg, cat.label].filter(Boolean).join(' · '))}</div>
+        <div class="small" style="margin-top:8px;">Customer: <b>${esc(r.customer)}</b><br>Ref: <b>${esc(r.proposalRef)}</b> · Request #${r.id}<br>Please complete by <b>${fmtDate(r.dueAt)}</b></div>
+      </div>
+      <b>Before you start, make sure you're with the asset and have:</b>
+      <ul class="need">
+        <li><span class="ni">🔑</span><span>Access to the ${cat.noun}, inside and out, and its keys</span></li>
+        <li><span class="ni">🔎</span><span>The ${cat.kind === 'vehicle' ? 'VIN / chassis number (usually on the windscreen or door pillar)' : 'serial / PIN plate'}</span></li>
+        <li><span class="ni">📄</span><span>The invoice or bill of sale${bolts.length ? ', plus: ' + bolts.map(b => b.name.toLowerCase()).join(', ') : ''}</span></li>
+        <li><span class="ni">📍</span><span>Location turned on. Your position is recorded with each photo.</span></li>
+      </ul>
+      <div class="notice n-info">📷 Photos must be taken live with your camera during this inspection. Each one is stamped with the time and your location.</div>
+      <p class="small muted">You can stop and come back to this link at any time. Your progress is saved after each step.</p>`,
+      `<button class="btn btn-primary" id="start">Start inspection</button>`);
+    $('#start').onclick = async () => {
+      $('#start').disabled = true; $('#start').textContent = 'Checking location…';
+      this.startGps();
+      this.startedAt = Date.now();
+      await mutate(r.id, x => {
+        x.status = 'in_progress'; x.startedAt = this.startedAt; x.step = 0;
+        if (!x.answers.siteAddress) x.answers.siteAddress = x.expectedAddress;
+        if (!x.answers.make) Object.assign(x.answers, { make: x.asset.make, model: x.asset.model });
+        x.events.push({ t: Date.now(), by: 'Inspector', text: 'Inspection started' });
+      }, true).then(x => { this.rec = JSON.parse(JSON.stringify(x)); });
+      this.step = 0; this.renderStep();
+    };
+  },
+
+  startGps() {
+    if (this.watch != null) return;
+    if (!navigator.geolocation) { this.gpsState = 'bad'; return; }
+    this.watch = navigator.geolocation.watchPosition(
+      p => { this.gps = { lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy }; this.gpsState = 'ok'; this.syncGpsChip(); },
+      () => { this.gpsState = 'bad'; this.syncGpsChip(); },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 });
+  },
+
+  gpsChipHtml() {
+    if (this.gpsState === 'ok') return `<span class="gps-chip">📍 Location recorded · ±${Math.round(this.gps.acc)} m</span>`;
+    if (this.gpsState === 'bad') return `<span class="gps-chip bad">📍 Location blocked — please allow location for this site</span>`;
+    return `<span class="gps-chip wait">📍 Getting your location…</span>`;
+  },
+  syncGpsChip() { const el = $('#gpsChip'); if (el) el.innerHTML = this.gpsChipHtml(); },
+
+  fieldHtml(f) {
+    const a = this.rec.answers, v = a[f.key] == null ? '' : a[f.key];
+    const err = this.errors.includes(f.key) ? ' err' : '';
+    const lab = `<label>${esc(f.label)}${f.req ? ' <span class="req">*</span>' : ''}</label>`;
+    const msg = `<div class="qerr">${f.type === 'photo' ? 'Please take this photo' : 'Please answer this question'}</div>`;
+    if (f.type === 'yesno' || f.type === 'choice') {
+      const opts = f.type === 'yesno' ? ['Yes', 'No'] : f.options;
+      return `<div class="q${err}" data-q="${f.key}">${lab}<div class="seg">${opts.map(o => `<button data-pick="${f.key}" data-v="${esc(o)}" class="${v === o ? 'on' : ''}">${esc(o)}</button>`).join('')}</div>${msg}</div>`;
+    }
+    if (f.type === 'photo') {
+      const p = this.rec.photos[f.key];
+      return `<div class="q${err}" data-q="${f.key}">${lab}
+        <label class="ptile ${p ? 'has' : ''}">${p ? `<img src="${photoSrc(this.rec, p)}" alt=""><span class="tick">✓</span>` : `<span>${ICON.cam}Tap to take photo</span>`}
+          <input type="file" accept="image/*" capture="environment" data-photo="${f.key}" hidden></label>
+        <div class="prow"><span class="small muted">${p ? '📍 ' + fmtStamp(p.t) : 'Use your rear camera'}</span><button class="linkbtn" data-sample="${f.key}">Use sample photo (demo)</button></div>${msg}</div>`;
+    }
+    if (f.type === 'textarea') return `<div class="q${err}" data-q="${f.key}">${lab}<textarea class="inp" rows="3" data-in="${f.key}">${esc(v)}</textarea>${msg}</div>`;
+    const t = f.type === 'number' ? 'text" inputmode="numeric' : f.type === 'date' ? 'date' : 'text';
+    return `<div class="q${err}" data-q="${f.key}">${lab}<input class="inp" type="${t}" data-in="${f.key}" value="${esc(v)}" ${f.upper ? 'style="text-transform:uppercase" autocapitalize="characters"' : ''}>${msg}</div>`;
+  },
+
+  renderStep() {
+    if (this.step >= this.steps.length) return this.renderReview();
+    const s = this.steps[this.step], a = this.rec.answers;
+    this.shell(`
+      <div id="gpsChip">${this.gpsChipHtml()}</div>
+      <h1>${esc(s.title)}</h1>
+      ${s.intro ? `<p class="sub" style="margin-bottom:18px;">${esc(s.intro)}</p>` : '<div style="height:14px;"></div>'}
+      ${this.gpsState === 'bad' && this.step === 0 ? `<div class="notice n-warn">Capitalflow needs your location to confirm where the asset is. Allow location for this page in your browser settings, then reload. You can carry on, but the report will show that location wasn't shared.</div>` : ''}
+      ${s.fields.filter(f => visible(f, a)).map(f => this.fieldHtml(f)).join('')}`,
+      `${this.step > 0 ? '<button class="btn btn-outline" id="back">Back</button>' : ''}<button class="btn btn-primary" id="next">Next</button>`, true);
+
+    document.querySelectorAll('[data-in]').forEach(el => el.oninput = () => {
+      const f = this.findField(el.dataset.in);
+      a[el.dataset.in] = f && f.upper ? el.value.toUpperCase() : el.value; el.closest('.q').classList.remove('err');
+    });
+    document.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => {
+      a[b.dataset.pick] = b.dataset.v; this.errors = this.errors.filter(k => k !== b.dataset.pick); this.renderStepKeepScroll();
+    });
+    document.querySelectorAll('[data-photo]').forEach(inp => inp.onchange = () => { if (inp.files[0]) this.takePhoto(inp.dataset.photo, inp.files[0]); });
+    document.querySelectorAll('[data-sample]').forEach(b => b.onclick = () => this.takeSample(b.dataset.sample));
+    if ($('#back')) $('#back').onclick = () => { this.step--; this.errors = []; this.renderStep(); };
+    $('#next').onclick = () => this.next();
+  },
+
+  renderStepKeepScroll() { const y = window.scrollY; this.renderStep(); window.scrollTo(0, y); },
+
+  findField(key) { for (const s of this.steps) for (const f of s.fields) if (f.key === key) return f; },
+
+  stampMeta() {
+    return { t: Date.now(), lat: this.gps ? this.gps.lat : null, lon: this.gps ? this.gps.lon : null };
+  },
+
+  takeSample(key) {
+    const f = this.findField(key), m = this.stampMeta();
+    const text = f.sampleText ? f.sampleText(this.rec.answers) : '';
+    const src = samplePhoto(f.sample || 'front', this.rec.category, text, m.t, m.lat != null ? { lat: m.lat, lon: m.lon } : null);
+    this.rec.photos[key] = { src, ...m, live: true, sample: true };
+    this.errors = this.errors.filter(k => k !== key);
+    this.renderStepKeepScroll();
+  },
+
+  takePhoto(key, file) {
+    const m = this.stampMeta();
+    // a file created well before this session started came from the gallery, not the camera
+    const live = !file.lastModified || file.lastModified >= (this.startedAt || Date.now()) - 2 * 60000;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const max = 1100, sc = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
+      const x = c.getContext('2d'); x.drawImage(img, 0, 0, c.width, c.height);
+      drawStamp(x, c.width, c.height, m.t, m.lat != null ? { lat: m.lat, lon: m.lon } : null);
+      this.rec.photos[key] = { src: c.toDataURL('image/jpeg', .7), ...m, live };
+      URL.revokeObjectURL(url);
+      this.errors = this.errors.filter(k => k !== key);
+      this.renderStepKeepScroll();
+    };
+    img.onerror = () => toast('That photo couldn\'t be read. Please try again.');
+    img.src = url;
+  },
+
+  validate(fields) {
+    const a = this.rec.answers;
+    return fields.filter(f => f.req && visible(f, a) && (f.type === 'photo' ? !this.rec.photos[f.key] : !String(a[f.key] || '').trim())).map(f => f.key);
+  },
+
+  async next() {
+    const s = this.steps[this.step];
+    this.errors = this.validate(s.fields);
+    if (this.errors.length) {
+      this.renderStepKeepScroll();
+      const el = document.querySelector('.q.err'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    $('#next').disabled = true; $('#next').textContent = 'Saving…';
+    // drop answers to questions that are now hidden (e.g. switched Yes → No)
+    s.fields.filter(f => !visible(f, this.rec.answers)).forEach(f => { delete this.rec.answers[f.key]; delete this.rec.photos[f.key]; });
+    const local = this.rec, stepNow = this.step + 1, gps = this.gps;
+    await mutate(local.id, x => {
+      x.answers = local.answers; x.photos = local.photos; x.step = stepNow;
+      if (gps) x.gps = gps;
+    }, true).catch(() => {});
+    this.step++;
+    this.renderStep();
+  },
+
+  renderReview() {
+    const r = this.rec, a = r.answers;
+    const secs = this.steps.map((s, i) => {
+      const fs = s.fields.filter(f => visible(f, a));
+      const lines = fs.filter(f => f.type !== 'photo').map(f => `<div class="l"><span>${esc(f.label.length > 46 ? f.label.slice(0, 44) + '…' : f.label)}</span><b>${esc(a[f.key] || '—')}</b></div>`).join('');
+      const thumbs = fs.filter(f => f.type === 'photo' && r.photos[f.key]).map(f => `<img src="${photoSrc(r, r.photos[f.key])}">`).join('');
+      return `<div class="rv-sec"><div class="h">${esc(s.title)}<button class="linkbtn" data-edit="${i}">Edit</button></div>${lines}${thumbs ? `<div class="rv-thumbs">${thumbs}</div>` : ''}</div>`;
+    }).join('');
+    this.shell(`
+      <h1>Review &amp; submit</h1>
+      <p class="sub" style="margin-bottom:16px;">Check everything is right. Once submitted, answers and photos can't be changed.</p>
+      ${secs}
+      <label class="declare" id="decl"><input type="checkbox" id="declare"><span>I confirm I'm physically with this asset, the photos were taken just now, and the information is accurate to the best of my knowledge.</span></label>
+      <div class="qerr small" id="declErr" style="display:none;color:#b8134f;margin-top:6px;">Please tick the declaration to submit.</div>`,
+      `<button class="btn btn-outline" id="back">Back</button><button class="btn btn-primary" id="submit">Submit inspection</button>`, true);
+    document.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => { this.step = +b.dataset.edit; this.renderStep(); });
+    $('#back').onclick = () => { this.step--; this.renderStep(); };
+    $('#submit').onclick = () => this.submit();
+  },
+
+  async submit() {
+    if (!$('#declare').checked) { $('#declErr').style.display = 'block'; return; }
+    $('#submit').disabled = true; $('#submit').textContent = 'Submitting…';
+    const local = this.rec, gps = this.gps;
+    // where is the address they typed? compare it with where the phone actually is
+    let siteC = null;
+    if (norm(local.answers.siteAddress) === norm(local.expectedAddress)) siteC = local.expectedCoords;
+    else siteC = await geocode(local.answers.siteAddress) || local.expectedCoords;
+    await mutate(local.id, x => {
+      x.answers = local.answers; x.photos = local.photos; x.step = this.steps.length;
+      if (gps) x.gps = gps;
+      x.siteCoords = siteC; x.status = 'completed'; x.completedAt = Date.now();
+      x.events.push({ t: Date.now(), by: 'Inspector', text: 'Inspection submitted' });
+    }, true);
+    if (this.watch != null) navigator.geolocation.clearWatch(this.watch);
+    this.renderDone(false);
+  },
+
+  renderDone(already) {
+    this.step = -1;
+    const r = this.rec;
+    this.shell(`
+      <div style="text-align:center;">
+        <div class="done-tick">✓</div>
+        <h1>${already ? 'Already submitted' : 'Inspection submitted'}</h1>
+        <p class="sub" style="font-size:14px;margin:8px 0 22px;">${already ? 'This inspection has already been completed.' : `Thanks, ${esc(r.inspector.name.split(' ')[0])}. Capitalflow has received your inspection and will be in touch if anything else is needed.`}</p>
+        <div class="asset-card" style="text-align:left;">
+          <div class="small">Request <b>#${r.id}</b> · Ref <b>${esc(r.proposalRef)}</b><br>${esc(assetName(r))} ${esc(r.asset.reg || '')}</div>
+        </div>
+        <p class="small muted">You can close this page.</p>
+        <p class="small muted" style="margin-top:30px;">Demo: <a href="#/report/${r.id}" id="toReport">open the report as Capitalflow staff →</a></p>
+      </div>`, null);
+    $('#toReport').onclick = e => {
+      e.preventDefault(); this.active = false;
+      if (!me()) signIn(r.reviewer || 'u1');
+      history.pushState(null, '', '/#/report/' + r.id); loadAll().then(route);
+    };
+  },
+};
+
+// =====================================================================
+//  Boot
+// =====================================================================
+(async function boot() {
+  buildSeeds().forEach(s => { s.updatedAt = 0; SEEDS[s.id] = s; });
+  await loadAll();
+  PREV = JSON.parse(JSON.stringify(DB.insp));
+  route();
+  setInterval(poll, 4000);
+})();
+</script>
+</body>
+</html>

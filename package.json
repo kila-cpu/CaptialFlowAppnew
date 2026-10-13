@@ -1,0 +1,12 @@
+{
+  "name": "capitalflow-inspections-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Capitalflow — remote asset inspections by secure link (interactive prototype)",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
