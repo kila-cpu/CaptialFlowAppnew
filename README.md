@@ -19,7 +19,7 @@ This version rebuilds the flow around those three points:
 ## Designed for the phone
 
 Everything, both the Capitalflow staff side and the inspector link, is laid out as a phone app: an app bar,
-a bottom tab bar (Inspections · **+ New** · Activity · Team), card lists and single-column forms and report.
+a bottom tab bar (Inspections · **+ New** · Team, with Activity as a bell at the top right), card lists and single-column forms and report.
 On a real phone it fills the screen. On a laptop it is shown inside a phone frame (like the earlier
 supplier-app demo), with a Reset demo data button underneath.
 
