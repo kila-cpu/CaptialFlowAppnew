@@ -16,12 +16,20 @@ This version rebuilds the flow around those three points:
    flags, a location-mismatch alert, red / amber / spoof counts, a map of the expected vs actual location,
    positive-impact figures, then every section with time- and GPS-stamped photos.
 
+## Designed for the phone
+
+Everything, both the Capitalflow staff side and the inspector link, is laid out as a phone app: an app bar,
+a bottom tab bar (Inspections · **+ New** · Activity · Team), card lists and single-column forms and report.
+On a real phone it fills the screen. On a laptop it is shown inside a phone frame (like the earlier
+supplier-app demo), with a Reset demo data button underneath.
+
 ## The flow
 
 | Who | Screen | What works |
 | --- | --- | --- |
 | Staff | **Sign in** | Email + password, or one-click "sign in as" for the four demo colleagues. Login is per browser tab, so two tabs can be two different people |
-| Staff | **Inspections** | KPI tiles (awaiting inspector, in progress, ready for review, query raised, approved), search, All team / Mine, flags column, live team activity feed |
+| Staff | **Inspections** | Swipeable status tiles (ready for review, in progress, awaiting inspector, query raised, approved) that filter the list, search, Team / Mine, a card per inspection with status, progress and flags |
+| Staff | **Activity** | Everything the team and the inspectors have done, newest first (dot on the tab when there's something new) |
 | Staff | **New request** | Proposal ref, customer, asset type (car, van, HGV, plant, agri), make / model / reg / VIN on file, expected address, who inspects (customer / dealer / broker), SMS / email, bolt-on checks, reviewer, link expiry |
 | Staff | **Request tracking** | The link, a QR code to open it on a phone, a preview of the SMS, and a live progress timeline (opened → step x of y → submitted). Send reminder / cancel |
 | Inspector | **Link flow** (`/i/<token>`) | Welcome, then location, asset details, VIN, odometer (hour meter for plant), five condition photos, documents, storage & security, then any bolt-ons. Review & declaration, then submit. Progress saves after every step and the link resumes where it left off |
